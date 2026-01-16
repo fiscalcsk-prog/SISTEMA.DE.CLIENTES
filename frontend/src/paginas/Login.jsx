@@ -36,14 +36,18 @@ export default function Login() {
       throw new Error(data.error || 'Erro ao fazer login');
     }
 
-    localStorage.setItem(
-      'usuario',
-      JSON.stringify({
-        id: data.user.id,
-        email: data.user.email,
-        username: data.user.username,
-      })
-    );
+  localStorage.setItem(
+  "usuario",
+  JSON.stringify({
+    ...data.user,
+    tipo: "ADM",
+    permissoes: {
+      cadastrar: true,
+      editar: true,
+      excluir: true,
+    },
+  })
+);
 
     toast.success('Login realizado com sucesso!');
     navigate('/dashboard');
