@@ -103,14 +103,14 @@ export default function Login() {
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="usuario" className="text-gray-300">
-                  Usuário (e-mail)
+                  Usuário
                 </Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="usuario"
-                    type="email"
-                    placeholder="email@empresa.com"
+                    type="text"
+                    placeholder="Digite seu usuário"
                     value={usuario}
                     onChange={(e) => setUsuario(e.target.value)}
                     required
