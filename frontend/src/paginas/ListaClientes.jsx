@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { API } from '@/App';
 import { Edit, Trash2, Search, UserPlus } from 'lucide-react';
 import Layout from '@/componentes/Layout';
+import { supabase } from '@/lib/supabase';
 
 export default function ListaClientes() {
   const navigate = useNavigate();
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+
   const [clientes, setClientes] = useState([]);
   const [clientesFiltrados, setClientesFiltrados] = useState([]);
   const [busca, setBusca] = useState('');
@@ -30,9 +30,15 @@ export default function ListaClientes() {
 
   const carregarClientes = async () => {
     try {
-      const response = await axios.get(`${API}/clientes`);
-      setClientes(response.data);
-      setClientesFiltrados(response.data);
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('*')
+        .order('razao_social');
+
+      if (error) throw error;
+
+      setClientes(data || []);
+      setClientesFiltrados(data || []);
     } catch (error) {
       toast.error('Erro ao carregar clientes');
     } finally {
@@ -48,28 +54,35 @@ export default function ListaClientes() {
 
     const buscaLower = busca.toLowerCase();
     const filtrados = clientes.filter(cliente =>
-      cliente.razao_social.toLowerCase().includes(buscaLower) ||
-      cliente.cnpj.toLowerCase().includes(buscaLower) ||
-      cliente.nome_responsavel.toLowerCase().includes(buscaLower)
+      cliente.razao_social?.toLowerCase().includes(buscaLower) ||
+      cliente.cnpj?.toLowerCase().includes(buscaLower) ||
+      cliente.nome_responsavel?.toLowerCase().includes(buscaLower)
     );
+
     setClientesFiltrados(filtrados);
   };
 
   const deletarCliente = async (clienteId) => {
     try {
-      await axios.delete(`${API}/clientes/${clienteId}`);
+      const { error } = await supabase
+        .from('clientes')
+        .delete()
+        .eq('id', clienteId);
+
+      if (error) throw error;
+
       toast.success('Cliente deletado com sucesso!');
       carregarClientes();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Erro ao deletar cliente');
+      toast.error('Erro ao deletar cliente');
     }
   };
 
   const getStatusBadge = (status) => {
     const cores = {
-      'ATIVO': 'bg-green-500/20 text-green-300 border-green-500/30',
-      'INATIVO': 'bg-red-500/20 text-red-300 border-red-500/30',
-      'PROBONO': 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+      ATIVO: 'bg-green-500/20 text-green-300 border-green-500/30',
+      INATIVO: 'bg-red-500/20 text-red-300 border-red-500/30',
+      PROBONO: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
     };
     return cores[status] || 'bg-gray-500/20 text-gray-300 border-gray-500/30';
   };
@@ -92,7 +105,6 @@ export default function ListaClientes() {
             <Button
               onClick={() => navigate('/cadastro-cliente')}
               className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
-              data-testid="btn-novo-cliente"
             >
               <UserPlus className="mr-2 h-4 w-4" />
               Novo Cliente
@@ -102,24 +114,21 @@ export default function ListaClientes() {
 
         <Card className="glass-effect border-blue-500/20">
           <CardHeader>
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <Input
-                  data-testid="input-busca-cliente"
-                  placeholder="Buscar por razão social, CNPJ ou responsável..."
-                  value={busca}
-                  onChange={(e) => setBusca(e.target.value)}
-                  className="pl-10 bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
-                />
-              </div>
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Input
+                placeholder="Buscar por razão social, CNPJ ou responsável..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                className="pl-10 bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+              />
             </div>
           </CardHeader>
           <CardContent>
             {carregando ? (
               <div className="text-center py-8 text-gray-400">Carregando...</div>
             ) : clientesFiltrados.length === 0 ? (
-              <div className="text-center py-8 text-gray-400" data-testid="mensagem-sem-clientes">
+              <div className="text-center py-8 text-gray-400">
                 {busca ? 'Nenhum cliente encontrado com essa busca' : 'Nenhum cliente cadastrado'}
               </div>
             ) : (
@@ -137,7 +146,7 @@ export default function ListaClientes() {
                   </TableHeader>
                   <TableBody>
                     {clientesFiltrados.map((cliente) => (
-                      <TableRow key={cliente.id} className="border-blue-500/20 hover:bg-white/5" data-testid={`cliente-row-${cliente.id}`}>
+                      <TableRow key={cliente.id} className="border-blue-500/20 hover:bg-white/5">
                         <TableCell className="text-white font-medium">{cliente.razao_social}</TableCell>
                         <TableCell className="text-gray-300">{cliente.cnpj}</TableCell>
                         <TableCell className="text-gray-300">{cliente.nome_responsavel}</TableCell>
@@ -154,7 +163,6 @@ export default function ListaClientes() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => navigate(`/cadastro-cliente?id=${cliente.id}`)}
-                                data-testid={`btn-editar-${cliente.id}`}
                                 className="bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
                               >
                                 <Edit className="h-4 w-4" />
@@ -166,7 +174,6 @@ export default function ListaClientes() {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    data-testid={`btn-excluir-${cliente.id}`}
                                     className="bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20"
                                   >
                                     <Trash2 className="h-4 w-4" />
@@ -176,15 +183,16 @@ export default function ListaClientes() {
                                   <AlertDialogHeader>
                                     <AlertDialogTitle className="text-white">Confirmar Exclusão</AlertDialogTitle>
                                     <AlertDialogDescription className="text-gray-300">
-                                      Tem certeza que deseja excluir o cliente <strong>{cliente.razao_social}</strong>? Esta ação não pode ser desfeita.
+                                      Tem certeza que deseja excluir o cliente <strong>{cliente.razao_social}</strong>?
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel className="bg-white/5 border-blue-500/30 text-white hover:bg-white/10">Cancelar</AlertDialogCancel>
+                                    <AlertDialogCancel className="bg-white/5 border-blue-500/30 text-white hover:bg-white/10">
+                                      Cancelar
+                                    </AlertDialogCancel>
                                     <AlertDialogAction
                                       onClick={() => deletarCliente(cliente.id)}
-                                      className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
-                                      data-testid={`btn-confirmar-excluir-${cliente.id}`}
+                                      className="bg-gradient-to-r from-red-500 to-red-600 text-white"
                                     >
                                       Excluir
                                     </AlertDialogAction>
