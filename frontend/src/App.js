@@ -15,34 +15,10 @@ import GerenciarUsuarios from "@/paginas/GerenciarUsuarios";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
 
-// Configurar axios para incluir token
-axios.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// Interceptor para tratar erros de autenticação
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("usuario");
-      window.location.href = "/";
-    }
-    return Promise.reject(error);
-  }
-);
 
 function RotaProtegida({ children }) {
-  const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/" replace />;
+  const usuario = localStorage.getItem("usuario");
+  return usuario ? children : <Navigate to="/" replace />;
 }
 
 function App() {
