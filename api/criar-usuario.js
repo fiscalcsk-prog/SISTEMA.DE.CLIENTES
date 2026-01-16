@@ -1,11 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
+const { createClient } = require("@supabase/supabase-js");
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método não permitido" });
   }
@@ -13,7 +13,6 @@ export default async function handler(req, res) {
   const { nome, username, email, senha, tipo, permissoes } = req.body;
 
   try {
-    // 1. Criar usuário no Auth
     const { data, error } = await supabase.auth.admin.createUser({
       email,
       password: senha,
@@ -24,7 +23,6 @@ export default async function handler(req, res) {
 
     const userId = data.user.id;
 
-    // 2. Inserir na tabela usuarios
     const { error: insertError } = await supabase
       .from("usuarios")
       .insert({
@@ -41,4 +39,4 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
-}
+};

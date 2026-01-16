@@ -1,11 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
+const { createClient } = require("@supabase/supabase-js");
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método não permitido" });
   }
@@ -13,7 +13,6 @@ export default async function handler(req, res) {
   const { username, senha } = req.body;
 
   try {
-    // 1. Buscar o usuário pelo username
     const { data: userRow, error: userError } = await supabase
       .from("usuarios")
       .select("id")
@@ -24,7 +23,6 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: "Usuário não encontrado" });
     }
 
-    // 2. Buscar o e-mail real no auth.users
     const { data: authUser, error: authError } =
       await supabase.auth.admin.getUserById(userRow.id);
 
@@ -34,7 +32,6 @@ export default async function handler(req, res) {
 
     const email = authUser.user.email;
 
-    // 3. Autenticar normalmente no Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password: senha,
@@ -54,4 +51,4 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-}
+};
