@@ -242,12 +242,13 @@ export default function CadastroCliente() {
 
                 {/* Natureza Jurídica */}
                 <div className="space-y-2">
-                  <Label htmlFor="natureza_juridica" className="text-gray-200">Natureza Jurídica</Label>
+                  <Label className="text-gray-200">Natureza Jurídica</Label>
                   <Select 
                     value={formData.natureza_juridica} 
                     onValueChange={(value) => setFormData({ ...formData, natureza_juridica: value })}
                   >
                     <SelectTrigger 
+                      id="natureza_juridica"
                       data-testid="select-natureza-juridica" 
                       className="bg-white/5 border-blue-500/30 text-white"
                     >
@@ -272,12 +273,13 @@ export default function CadastroCliente() {
 
                 {/* Regime Tributário */}
                 <div className="space-y-2">
-                  <Label htmlFor="regime_tributario" className="text-gray-200">Regime Tributário</Label>
+                  <Label className="text-gray-200">Regime Tributário</Label>
                   <Select 
                     value={formData.regime_tributario} 
                     onValueChange={(value) => setFormData({ ...formData, regime_tributario: value })}
                   >
                     <SelectTrigger 
+                      id="regime_tributario"
                       data-testid="select-regime-tributario" 
                       className="bg-white/5 border-blue-500/30 text-white"
                     >
@@ -295,12 +297,13 @@ export default function CadastroCliente() {
 
                 {/* Porte */}
                 <div className="space-y-2">
-                  <Label htmlFor="porte" className="text-gray-200">Porte</Label>
+                  <Label className="text-gray-200">Porte</Label>
                   <Select 
                     value={formData.porte} 
                     onValueChange={(value) => setFormData({ ...formData, porte: value })}
                   >
                     <SelectTrigger 
+                      id="porte"
                       data-testid="select-porte" 
                       className="bg-white/5 border-blue-500/30 text-white"
                     >
@@ -318,12 +321,13 @@ export default function CadastroCliente() {
 
                 {/* Modalidade */}
                 <div className="space-y-2">
-                  <Label htmlFor="modalidade" className="text-gray-200">Modalidade</Label>
+                  <Label className="text-gray-200">Modalidade</Label>
                   <Select 
                     value={formData.modalidade} 
                     onValueChange={(value) => setFormData({ ...formData, modalidade: value })}
                   >
                     <SelectTrigger 
+                      id="modalidade"
                       data-testid="select-modalidade" 
                       className="bg-white/5 border-blue-500/30 text-white"
                     >
@@ -341,12 +345,13 @@ export default function CadastroCliente() {
 
                 {/* Certificado Digital */}
                 <div className="space-y-2">
-                  <Label htmlFor="certificado" className="text-gray-200">Certificado Digital</Label>
+                  <Label className="text-gray-200">Certificado Digital</Label>
                   <Select 
                     value={formData.certificado} 
                     onValueChange={(value) => setFormData({ ...formData, certificado: value })}
                   >
                     <SelectTrigger 
+                      id="certificado"
                       data-testid="select-certificado" 
                       className="bg-white/5 border-blue-500/30 text-white"
                     >
@@ -364,12 +369,13 @@ export default function CadastroCliente() {
 
                 {/* Procuração */}
                 <div className="space-y-2">
-                  <Label htmlFor="procuracao" className="text-gray-200">Procuração</Label>
+                  <Label className="text-gray-200">Procuração</Label>
                   <Select 
                     value={formData.procuracao} 
                     onValueChange={(value) => setFormData({ ...formData, procuracao: value })}
                   >
                     <SelectTrigger 
+                      id="procuracao"
                       data-testid="select-procuracao" 
                       className="bg-white/5 border-blue-500/30 text-white"
                     >
