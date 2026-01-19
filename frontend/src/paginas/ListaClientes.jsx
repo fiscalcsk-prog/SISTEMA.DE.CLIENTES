@@ -32,6 +32,7 @@ export default function ListaClientes() {
       const { data, error } = await supabase
         .from('clientes')
         .select('*')
+        .is('data_saida', null)
         .order('razao_social', { ascending: true });
 
       if (error) {
@@ -165,7 +166,6 @@ export default function ListaClientes() {
                         <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Procuração</th>
                         <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Contrato</th>
                         <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Data Inicial</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Data de Saída</th>
                         <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Responsável</th>
                         <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Telefone</th>
                         <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>E-mail</th>
@@ -221,7 +221,6 @@ export default function ListaClientes() {
                             <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.procuracao || '-'}</td>
                             <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.contrato || '-'}</td>
                             <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{formatarData(cliente.data_inicial)}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{formatarData(cliente.data_saida)}</td>
                             <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.responsavel || '-'}</td>
                             <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.telefone || '-'}</td>
                             <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.email || '-'}</td>
