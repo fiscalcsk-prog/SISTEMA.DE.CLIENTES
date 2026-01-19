@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { API } from '@/App';
-import { Save, Plus, Trash2, ArrowLeft } from 'lucide-react';
+import { Save, ArrowLeft } from 'lucide-react';
 import Layout from '@/componentes/Layout';
+import { supabase } from '@/lib/supabase';
 
 export default function CadastroCliente() {
   const navigate = useNavigate();
@@ -19,65 +18,58 @@ export default function CadastroCliente() {
 
   const [formData, setFormData] = useState({
     razao_social: '',
+    fantasia: '',
     cnpj: '',
     ccm: '',
-    regime_tributario: '',
     natureza_juridica: '',
-    porte_empresa: '',
-    nome_responsavel: '',
-    telefones: [''],
-    emails: [''],
-    status: 'ATIVO',
+    regime_tributario: '',
+    porte: '',
+    contrato: '',
     data_inicial: '',
-    data_saida: ''
-  });
-
-  const [opcoes, setOpcoes] = useState({
-    regimes: [],
-    naturezas: [],
-    portes: [],
-    statusList: []
+    data_saida: '',
+    modalidade: '',
+    certificado: '',
+    procuracao: '',
+    responsavel: '',
+    telefone: '',
+    e_mail: ''
   });
 
   const [carregando, setCarregando] = useState(false);
 
   useEffect(() => {
-    carregarOpcoes();
     if (modoEdicao) {
       carregarCliente();
     }
   }, [clienteId]);
 
-  const carregarOpcoes = async () => {
-    try {
-      const [regimes, naturezas, portes, statusList] = await Promise.all([
-        axios.get(`${API}/opcoes/regimes-tributarios`),
-        axios.get(`${API}/opcoes/naturezas-juridicas`),
-        axios.get(`${API}/opcoes/portes-empresa`),
-        axios.get(`${API}/opcoes/status`)
-      ]);
-
-      setOpcoes({
-        regimes: regimes.data,
-        naturezas: naturezas.data,
-        portes: portes.data,
-        statusList: statusList.data
-      });
-    } catch (error) {
-      toast.error('Erro ao carregar opções');
-    }
-  };
-
   const carregarCliente = async () => {
     try {
-      const response = await axios.get(`${API}/clientes/${clienteId}`);
-      const cliente = response.data;
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('*')
+        .eq('id', clienteId)
+        .single();
+
+      if (error) throw error;
+
       setFormData({
-        ...cliente,
-        telefones: cliente.telefones.length > 0 ? cliente.telefones : [''],
-        emails: cliente.emails.length > 0 ? cliente.emails : [''],
-        data_inicial: cliente.data_inicial || '',
-        data_saida: cliente.data_saida || ''
+        razao_social: data.razao_social || '',
+        fantasia: data.fantasia || '',
+        cnpj: data.cnpj || '',
+        ccm: data.ccm || '',
+        natureza_juridica: data.natureza_juridica || '',
+        regime_tributario: data.regime_tributario || '',
+        porte: data.porte || '',
+        contrato: data.contrato || '',
+        data_inicial: data.data_inicial || '',
+        data_saida: data.data_saida || '',
+        modalidade: data.modalidade || '',
+        certificado: data.certificado || '',
+        procuracao: data.procuracao || '',
+        responsavel: data.responsavel || '',
+        telefone: data.telefone || '',
+        e_mail: data.e_mail || ''
       });
     } catch (error) {
       toast.error('Erro ao carregar cliente');
@@ -90,56 +82,29 @@ export default function CadastroCliente() {
     setCarregando(true);
 
     try {
-      const dados = {
-        ...formData,
-        telefones: formData.telefones.filter(t => t.trim() !== ''),
-        emails: formData.emails.filter(e => e.trim() !== '')
-      };
-
       if (modoEdicao) {
-        await axios.put(`${API}/clientes/${clienteId}`, dados);
+        const { error } = await supabase
+          .from('clientes')
+          .update(formData)
+          .eq('id', clienteId);
+
+        if (error) throw error;
         toast.success('Cliente atualizado com sucesso!');
       } else {
-        await axios.post(`${API}/clientes`, dados);
+        const { error } = await supabase
+          .from('clientes')
+          .insert([formData]);
+
+        if (error) throw error;
         toast.success('Cliente cadastrado com sucesso!');
       }
 
       navigate('/clientes');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Erro ao salvar cliente');
+      toast.error(error.message || 'Erro ao salvar cliente');
     } finally {
       setCarregando(false);
     }
-  };
-
-  const adicionarTelefone = () => {
-    setFormData({ ...formData, telefones: [...formData.telefones, ''] });
-  };
-
-  const removerTelefone = (index) => {
-    const novosTelefones = formData.telefones.filter((_, i) => i !== index);
-    setFormData({ ...formData, telefones: novosTelefones.length > 0 ? novosTelefones : [''] });
-  };
-
-  const atualizarTelefone = (index, valor) => {
-    const novosTelefones = [...formData.telefones];
-    novosTelefones[index] = valor;
-    setFormData({ ...formData, telefones: novosTelefones });
-  };
-
-  const adicionarEmail = () => {
-    setFormData({ ...formData, emails: [...formData.emails, ''] });
-  };
-
-  const removerEmail = (index) => {
-    const novosEmails = formData.emails.filter((_, i) => i !== index);
-    setFormData({ ...formData, emails: novosEmails.length > 0 ? novosEmails : [''] });
-  };
-
-  const atualizarEmail = (index, valor) => {
-    const novosEmails = [...formData.emails];
-    novosEmails[index] = valor;
-    setFormData({ ...formData, emails: novosEmails });
   };
 
   return (
@@ -170,6 +135,7 @@ export default function CadastroCliente() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Razão Social */}
                 <div className="space-y-2">
                   <Label htmlFor="razao_social" className="text-gray-200">Razão Social *</Label>
                   <Input
@@ -182,98 +148,91 @@ export default function CadastroCliente() {
                   />
                 </div>
 
+                {/* Fantasia */}
                 <div className="space-y-2">
-                  <Label htmlFor="cnpj" className="text-gray-200">CNPJ *</Label>
+                  <Label htmlFor="fantasia" className="text-gray-200">Fantasia</Label>
+                  <Input
+                    id="fantasia"
+                    data-testid="input-fantasia"
+                    value={formData.fantasia}
+                    onChange={(e) => setFormData({ ...formData, fantasia: e.target.value })}
+                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+                  />
+                </div>
+
+                {/* CNPJ */}
+                <div className="space-y-2">
+                  <Label htmlFor="cnpj" className="text-gray-200">CNPJ</Label>
                   <Input
                     id="cnpj"
                     data-testid="input-cnpj"
                     value={formData.cnpj}
                     onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })}
-                    required
                     className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
                   />
                 </div>
 
+                {/* CCM */}
                 <div className="space-y-2">
-                  <Label htmlFor="ccm" className="text-gray-200">CCM *</Label>
+                  <Label htmlFor="ccm" className="text-gray-200">CCM</Label>
                   <Input
                     id="ccm"
                     data-testid="input-ccm"
                     value={formData.ccm}
                     onChange={(e) => setFormData({ ...formData, ccm: e.target.value })}
-                    required
                     className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
                   />
                 </div>
 
+                {/* Natureza Jurídica */}
                 <div className="space-y-2">
-                  <Label htmlFor="regime_tributario" className="text-gray-200">Regime Tributário *</Label>
-                  <Select value={formData.regime_tributario} onValueChange={(value) => setFormData({ ...formData, regime_tributario: value })} required>
-                    <SelectTrigger data-testid="select-regime-tributario" className="bg-white/5 border-blue-500/30 text-white">
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {opcoes.regimes.map((regime) => (
-                        <SelectItem key={regime} value={regime}>{regime}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="natureza_juridica" className="text-gray-200">Natureza Jurídica *</Label>
-                  <Select value={formData.natureza_juridica} onValueChange={(value) => setFormData({ ...formData, natureza_juridica: value })} required>
-                    <SelectTrigger data-testid="select-natureza-juridica" className="bg-white/5 border-blue-500/30 text-white">
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {opcoes.naturezas.map((natureza) => (
-                        <SelectItem key={natureza} value={natureza}>{natureza}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="porte_empresa" className="text-gray-200">Porte da Empresa *</Label>
-                  <Select value={formData.porte_empresa} onValueChange={(value) => setFormData({ ...formData, porte_empresa: value })} required>
-                    <SelectTrigger data-testid="select-porte-empresa" className="bg-white/5 border-blue-500/30 text-white">
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {opcoes.portes.map((porte) => (
-                        <SelectItem key={porte} value={porte}>{porte}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="nome_responsavel" className="text-gray-200">Nome do Responsável *</Label>
+                  <Label htmlFor="natureza_juridica" className="text-gray-200">Natureza Jurídica</Label>
                   <Input
-                    id="nome_responsavel"
-                    data-testid="input-nome-responsavel"
-                    value={formData.nome_responsavel}
-                    onChange={(e) => setFormData({ ...formData, nome_responsavel: e.target.value })}
-                    required
+                    id="natureza_juridica"
+                    data-testid="input-natureza-juridica"
+                    value={formData.natureza_juridica}
+                    onChange={(e) => setFormData({ ...formData, natureza_juridica: e.target.value })}
                     className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
                   />
                 </div>
 
+                {/* Regime Tributário */}
                 <div className="space-y-2">
-                  <Label htmlFor="status" className="text-gray-200">Status *</Label>
-                  <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })} required>
-                    <SelectTrigger data-testid="select-status" className="bg-white/5 border-blue-500/30 text-white">
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {opcoes.statusList.map((status) => (
-                        <SelectItem key={status} value={status}>{status}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="regime_tributario" className="text-gray-200">Regime Tributário</Label>
+                  <Input
+                    id="regime_tributario"
+                    data-testid="input-regime-tributario"
+                    value={formData.regime_tributario}
+                    onChange={(e) => setFormData({ ...formData, regime_tributario: e.target.value })}
+                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+                  />
                 </div>
 
+                {/* Porte */}
+                <div className="space-y-2">
+                  <Label htmlFor="porte" className="text-gray-200">Porte</Label>
+                  <Input
+                    id="porte"
+                    data-testid="input-porte"
+                    value={formData.porte}
+                    onChange={(e) => setFormData({ ...formData, porte: e.target.value })}
+                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+                  />
+                </div>
+
+                {/* Contrato */}
+                <div className="space-y-2">
+                  <Label htmlFor="contrato" className="text-gray-200">Contrato</Label>
+                  <Input
+                    id="contrato"
+                    data-testid="input-contrato"
+                    value={formData.contrato}
+                    onChange={(e) => setFormData({ ...formData, contrato: e.target.value })}
+                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+                  />
+                </div>
+
+                {/* Data Inicial */}
                 <div className="space-y-2">
                   <Label htmlFor="data_inicial" className="text-gray-200">Data Inicial</Label>
                   <Input
@@ -286,6 +245,7 @@ export default function CadastroCliente() {
                   />
                 </div>
 
+                {/* Data Saída */}
                 <div className="space-y-2">
                   <Label htmlFor="data_saida" className="text-gray-200">Data de Saída</Label>
                   <Input
@@ -297,87 +257,81 @@ export default function CadastroCliente() {
                     className="bg-white/5 border-blue-500/30 text-white"
                   />
                 </div>
-              </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label className="text-gray-200 text-lg">Telefones</Label>
-                  <Button
-                    type="button"
-                    onClick={adicionarTelefone}
-                    variant="outline"
-                    size="sm"
-                    data-testid="btn-adicionar-telefone"
-                    className="bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Adicionar Telefone
-                  </Button>
+                {/* Modalidade */}
+                <div className="space-y-2">
+                  <Label htmlFor="modalidade" className="text-gray-200">Modalidade</Label>
+                  <Input
+                    id="modalidade"
+                    data-testid="input-modalidade"
+                    value={formData.modalidade}
+                    onChange={(e) => setFormData({ ...formData, modalidade: e.target.value })}
+                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+                  />
                 </div>
-                {formData.telefones.map((telefone, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      data-testid={`input-telefone-${index}`}
-                      value={telefone}
-                      onChange={(e) => atualizarTelefone(index, e.target.value)}
-                      placeholder="(00) 00000-0000"
-                      className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
-                    />
-                    {formData.telefones.length > 1 && (
-                      <Button
-                        type="button"
-                        onClick={() => removerTelefone(index)}
-                        variant="outline"
-                        size="icon"
-                        data-testid={`btn-remover-telefone-${index}`}
-                        className="bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label className="text-gray-200 text-lg">E-mails</Label>
-                  <Button
-                    type="button"
-                    onClick={adicionarEmail}
-                    variant="outline"
-                    size="sm"
-                    data-testid="btn-adicionar-email"
-                    className="bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Adicionar E-mail
-                  </Button>
+                {/* Certificado */}
+                <div className="space-y-2">
+                  <Label htmlFor="certificado" className="text-gray-200">Certificado</Label>
+                  <Input
+                    id="certificado"
+                    data-testid="input-certificado"
+                    value={formData.certificado}
+                    onChange={(e) => setFormData({ ...formData, certificado: e.target.value })}
+                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+                  />
                 </div>
-                {formData.emails.map((email, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      data-testid={`input-email-${index}`}
-                      type="email"
-                      value={email}
-                      onChange={(e) => atualizarEmail(index, e.target.value)}
-                      placeholder="email@exemplo.com"
-                      className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
-                    />
-                    {formData.emails.length > 1 && (
-                      <Button
-                        type="button"
-                        onClick={() => removerEmail(index)}
-                        variant="outline"
-                        size="icon"
-                        data-testid={`btn-remover-email-${index}`}
-                        className="bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
+
+                {/* Procuração */}
+                <div className="space-y-2">
+                  <Label htmlFor="procuracao" className="text-gray-200">Procuração</Label>
+                  <Input
+                    id="procuracao"
+                    data-testid="input-procuracao"
+                    value={formData.procuracao}
+                    onChange={(e) => setFormData({ ...formData, procuracao: e.target.value })}
+                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+                  />
+                </div>
+
+                {/* Responsável */}
+                <div className="space-y-2">
+                  <Label htmlFor="responsavel" className="text-gray-200">Responsável</Label>
+                  <Input
+                    id="responsavel"
+                    data-testid="input-responsavel"
+                    value={formData.responsavel}
+                    onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
+                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+                  />
+                </div>
+
+                {/* Telefone */}
+                <div className="space-y-2">
+                  <Label htmlFor="telefone" className="text-gray-200">Telefone</Label>
+                  <Input
+                    id="telefone"
+                    data-testid="input-telefone"
+                    value={formData.telefone}
+                    onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                    placeholder="(00) 00000-0000"
+                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+                  />
+                </div>
+
+                {/* E-mail */}
+                <div className="space-y-2">
+                  <Label htmlFor="e_mail" className="text-gray-200">E-mail</Label>
+                  <Input
+                    id="e_mail"
+                    data-testid="input-email"
+                    type="email"
+                    value={formData.e_mail}
+                    onChange={(e) => setFormData({ ...formData, e_mail: e.target.value })}
+                    placeholder="email@exemplo.com"
+                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
+                  />
+                </div>
               </div>
 
               <div className="flex gap-4 justify-end pt-6">
