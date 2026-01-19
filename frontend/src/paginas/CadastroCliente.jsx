@@ -93,6 +93,64 @@ export default function CadastroCliente() {
 
   const [carregando, setCarregando] = useState(false);
 
+  // Função para formatar CNPJ/CPF automaticamente
+  const formatarCNPJCPF = (valor) => {
+    // Remove tudo que não é número
+    const apenasNumeros = valor.replace(/\D/g, '');
+    
+    // Se tem 11 dígitos ou menos, formata como CPF
+    if (apenasNumeros.length <= 11) {
+      return apenasNumeros
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    
+    // Se tem mais de 11 dígitos, formata como CNPJ
+    return apenasNumeros
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1/$2')
+      .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+  };
+
+  // Função para formatar telefone (celular ou fixo)
+  const formatarTelefone = (valor) => {
+    // Remove tudo que não é número
+    const apenasNumeros = valor.replace(/\D/g, '');
+    
+    // Se tem 11 dígitos, formata como celular: (00) 00000-0000
+    if (apenasNumeros.length === 11) {
+      return apenasNumeros
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{5})(\d{4})$/, '$1-$2');
+    }
+    
+    // Se tem 10 dígitos, formata como fixo: (00) 0000-0000
+    if (apenasNumeros.length === 10) {
+      return apenasNumeros
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{4})(\d{4})$/, '$1-$2');
+    }
+    
+    // Formatação progressiva enquanto digita
+    if (apenasNumeros.length > 2) {
+      let formatted = apenasNumeros.replace(/(\d{2})(\d)/, '($1) $2');
+      
+      if (apenasNumeros.length > 6) {
+        // Assume celular se já tem mais de 6 dígitos
+        formatted = formatted.replace(/(\d{5})(\d)/, '$1-$2');
+      } else if (apenasNumeros.length > 5) {
+        // Pode ser fixo
+        formatted = formatted.replace(/(\d{4})(\d)/, '$1-$2');
+      }
+      
+      return formatted;
+    }
+    
+    return apenasNumeros;
+  };
+
   useEffect(() => {
     if (modoEdicao) {
       carregarCliente();
@@ -138,10 +196,30 @@ export default function CadastroCliente() {
     setCarregando(true);
 
     try {
+      // Garantir que todos os campos sejam strings
+      const dadosParaSalvar = {
+        razao_social: String(formData.razao_social || ''),
+        fantasia: String(formData.fantasia || ''),
+        cnpj: String(formData.cnpj || ''),
+        ccm: String(formData.ccm || ''),
+        natureza_juridica: String(formData.natureza_juridica || ''),
+        regime_tributario: String(formData.regime_tributario || ''),
+        porte: String(formData.porte || ''),
+        contrato: String(formData.contrato || ''),
+        data_inicial: formData.data_inicial || null,
+        data_saida: formData.data_saida || null,
+        modalidade: String(formData.modalidade || ''),
+        certificado: String(formData.certificado || ''),
+        procuracao: String(formData.procuracao || ''),
+        responsavel: String(formData.responsavel || ''),
+        telefone: String(formData.telefone || ''),
+        email: String(formData.email || '')
+      };
+
       if (modoEdicao) {
         const { error } = await supabase
           .from('clientes')
-          .update(formData)
+          .update(dadosParaSalvar)
           .eq('id', clienteId);
 
         if (error) throw error;
@@ -149,7 +227,7 @@ export default function CadastroCliente() {
       } else {
         const { error } = await supabase
           .from('clientes')
-          .insert([formData]);
+          .insert([dadosParaSalvar]);
 
         if (error) throw error;
         toast.success('Cliente cadastrado com sucesso!');
@@ -157,6 +235,7 @@ export default function CadastroCliente() {
 
       navigate('/clientes');
     } catch (error) {
+      console.error('Erro detalhado:', error);
       toast.error(error.message || 'Erro ao salvar cliente');
     } finally {
       setCarregando(false);
@@ -218,12 +297,17 @@ export default function CadastroCliente() {
 
                 {/* CNPJ */}
                 <div className="space-y-2">
-                  <Label htmlFor="cnpj" className="text-gray-200">CNPJ</Label>
+                  <Label htmlFor="cnpj" className="text-gray-200">CNPJ / CPF</Label>
                   <Input
                     id="cnpj"
                     data-testid="input-cnpj"
                     value={formData.cnpj}
-                    onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })}
+                    onChange={(e) => {
+                      const valorFormatado = formatarCNPJCPF(e.target.value);
+                      setFormData({ ...formData, cnpj: valorFormatado });
+                    }}
+                    placeholder="00.000.000/0000-00"
+                    maxLength={18}
                     className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
                   />
                 </div>
@@ -448,8 +532,12 @@ export default function CadastroCliente() {
                     id="telefone"
                     data-testid="input-telefone"
                     value={formData.telefone}
-                    onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                    onChange={(e) => {
+                      const valorFormatado = formatarTelefone(e.target.value);
+                      setFormData({ ...formData, telefone: valorFormatado });
+                    }}
                     placeholder="(00) 00000-0000"
+                    maxLength={15}
                     className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
                   />
                 </div>
