@@ -55,8 +55,9 @@ export default function ListaClientes() {
     const buscaLower = busca.toLowerCase();
     const filtrados = clientes.filter(cliente =>
       cliente.razao_social?.toLowerCase().includes(buscaLower) ||
+      cliente.fantasia?.toLowerCase().includes(buscaLower) ||
       cliente.cnpj?.toLowerCase().includes(buscaLower) ||
-      cliente.nome_responsavel?.toLowerCase().includes(buscaLower)
+      cliente.responsavel?.toLowerCase().includes(buscaLower)
     );
 
     setClientesFiltrados(filtrados);
@@ -85,6 +86,11 @@ export default function ListaClientes() {
       PROBONO: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
     };
     return cores[status] || 'bg-gray-500/20 text-gray-300 border-gray-500/30';
+  };
+
+  const formatarData = (data) => {
+    if (!data) return '-';
+    return new Date(data).toLocaleDateString('pt-BR');
   };
 
   const podeEditar = usuario.permissoes?.editar || usuario.tipo === 'ADM';
@@ -117,7 +123,7 @@ export default function ListaClientes() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
               <Input
-                placeholder="Buscar por razão social, CNPJ ou responsável..."
+                placeholder="Buscar por razão social, fantasia, CNPJ ou responsável..."
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
                 className="pl-10 bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
@@ -137,25 +143,31 @@ export default function ListaClientes() {
                   <TableHeader>
                     <TableRow className="border-blue-500/20 hover:bg-white/5">
                       <TableHead className="text-gray-300">Razão Social</TableHead>
+                      <TableHead className="text-gray-300">Fantasia</TableHead>
                       <TableHead className="text-gray-300">CNPJ</TableHead>
+                      <TableHead className="text-gray-300">CCM</TableHead>
                       <TableHead className="text-gray-300">Responsável</TableHead>
-                      <TableHead className="text-gray-300">Status</TableHead>
-                      <TableHead className="text-gray-300">Porte</TableHead>
-                      <TableHead className="text-gray-300 text-right">Ações</TableHead>
+                      <TableHead className="text-gray-300">Telefone</TableHead>
+                      <TableHead className="text-gray-300">E-mail</TableHead>
+                      <TableHead className="text-gray-300">Modalidade</TableHead>
+                      <TableHead className="text-gray-300">Contrato</TableHead>
+                      <TableHead className="text-gray-300">Data Inicial</TableHead>
+                      <TableHead className="text-gray-300">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {clientesFiltrados.map((cliente) => (
                       <TableRow key={cliente.id} className="border-blue-500/20 hover:bg-white/5">
                         <TableCell className="text-white font-medium">{cliente.razao_social}</TableCell>
+                        <TableCell className="text-gray-300">{cliente.fantasia || '-'}</TableCell>
                         <TableCell className="text-gray-300">{cliente.cnpj}</TableCell>
-                        <TableCell className="text-gray-300">{cliente.nome_responsavel}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusBadge(cliente.status)}>
-                            {cliente.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-gray-300">{cliente.porte_empresa}</TableCell>
+                        <TableCell className="text-gray-300">{cliente.ccm || '-'}</TableCell>
+                        <TableCell className="text-gray-300">{cliente.responsavel || '-'}</TableCell>
+                        <TableCell className="text-gray-300">{cliente.telefone || '-'}</TableCell>
+                        <TableCell className="text-gray-300 max-w-[200px] truncate">{cliente.e_mail || '-'}</TableCell>
+                        <TableCell className="text-gray-300">{cliente.modalidade || '-'}</TableCell>
+                        <TableCell className="text-gray-300">{cliente.contrato || '-'}</TableCell>
+                        <TableCell className="text-gray-300">{formatarData(cliente.data_inicial)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex gap-2 justify-end">
                             {podeEditar && (
