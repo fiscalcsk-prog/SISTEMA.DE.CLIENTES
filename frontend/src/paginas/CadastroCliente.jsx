@@ -88,7 +88,7 @@ export default function CadastroCliente() {
     procuracao: '',
     responsavel: '',
     telefone: '',
-    e_mail: ''
+    email: ''
   });
 
   const [carregando, setCarregando] = useState(false);
@@ -125,7 +125,7 @@ export default function CadastroCliente() {
         procuracao: data.procuracao || '',
         responsavel: data.responsavel || '',
         telefone: data.telefone || '',
-        e_mail: data.e_mail || ''
+        email: data.email || ''
       });
     } catch (error) {
       toast.error('Erro ao carregar cliente');
@@ -458,11 +458,11 @@ export default function CadastroCliente() {
                 <div className="space-y-2">
                   <Label htmlFor="e_mail" className="text-gray-200">E-mail</Label>
                   <Input
-                    id="e_mail"
+                    id="email"
                     data-testid="input-email"
                     type="email"
-                    value={formData.e_mail}
-                    onChange={(e) => setFormData({ ...formData, e_mail: e.target.value })}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="email@exemplo.com"
                     className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
                   />
