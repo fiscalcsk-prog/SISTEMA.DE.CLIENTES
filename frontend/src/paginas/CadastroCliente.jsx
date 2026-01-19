@@ -10,6 +10,62 @@ import { Save, ArrowLeft } from 'lucide-react';
 import Layout from '@/componentes/Layout';
 import { supabase } from '@/lib/supabase';
 
+const NATUREZAS_JURIDICAS = [
+  { grupo: 'Pessoas Jurídicas Empresariais', opcoes: [
+    'EI – Empresário Individual',
+    'SLU – Sociedade Limitada Unipessoal',
+    'LTDA – Sociedade Empresária Limitada',
+    'SA – Sociedade Anônima',
+    'SCP – Sociedade em Conta de Participação',
+    'Cooperativa',
+    'Consórcio de Empresas'
+  ]},
+  { grupo: 'Pessoas Jurídicas Não Empresariais', opcoes: [
+    'Associação',
+    'Fundação',
+    'Organização Religiosa',
+    'Partido Político',
+    'Condomínio',
+    'Cartório / Registro Público'
+  ]},
+  { grupo: 'Pessoas Físicas Equiparadas', opcoes: [
+    'Produtor Rural (Pessoa Física com CNPJ)',
+    'Profissional Autônomo Equiparado a PJ (em situações específicas)'
+  ]},
+  { grupo: 'Entidades Públicas', opcoes: [
+    'Órgão Público do Poder Executivo Federal, Estadual ou Municipal',
+    'Autarquia',
+    'Fundação Pública',
+    'Empresa Pública',
+    'Sociedade de Economia Mista'
+  ]}
+];
+
+const REGIMES_TRIBUTARIOS = [
+  'Lucro Real',
+  'Lucro Presumido',
+  'Simples Nacional',
+  'IMUNE/ISENTA'
+];
+
+const PORTES = [
+  'MEI',
+  'ME',
+  'EPP',
+  'Média Empresa',
+  'Grande Empresa'
+];
+
+const MODALIDADES = [
+  'PRÓ-BONO',
+  'PAGA'
+];
+
+const OPCOES_SIM_NAO = [
+  'SIM',
+  'NÃO'
+];
+
 export default function CadastroCliente() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -187,37 +243,146 @@ export default function CadastroCliente() {
                 {/* Natureza Jurídica */}
                 <div className="space-y-2">
                   <Label htmlFor="natureza_juridica" className="text-gray-200">Natureza Jurídica</Label>
-                  <Input
-                    id="natureza_juridica"
-                    data-testid="input-natureza-juridica"
-                    value={formData.natureza_juridica}
-                    onChange={(e) => setFormData({ ...formData, natureza_juridica: e.target.value })}
-                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
-                  />
+                  <Select 
+                    value={formData.natureza_juridica} 
+                    onValueChange={(value) => setFormData({ ...formData, natureza_juridica: value })}
+                  >
+                    <SelectTrigger 
+                      data-testid="select-natureza-juridica" 
+                      className="bg-white/5 border-blue-500/30 text-white"
+                    >
+                      <SelectValue placeholder="Selecione a natureza jurídica" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {NATUREZAS_JURIDICAS.map((grupo) => (
+                        <div key={grupo.grupo}>
+                          <div className="px-2 py-1.5 text-sm font-semibold text-gray-400">
+                            {grupo.grupo}
+                          </div>
+                          {grupo.opcoes.map((opcao) => (
+                            <SelectItem key={opcao} value={opcao}>
+                              {opcao}
+                            </SelectItem>
+                          ))}
+                        </div>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Regime Tributário */}
                 <div className="space-y-2">
                   <Label htmlFor="regime_tributario" className="text-gray-200">Regime Tributário</Label>
-                  <Input
-                    id="regime_tributario"
-                    data-testid="input-regime-tributario"
-                    value={formData.regime_tributario}
-                    onChange={(e) => setFormData({ ...formData, regime_tributario: e.target.value })}
-                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
-                  />
+                  <Select 
+                    value={formData.regime_tributario} 
+                    onValueChange={(value) => setFormData({ ...formData, regime_tributario: value })}
+                  >
+                    <SelectTrigger 
+                      data-testid="select-regime-tributario" 
+                      className="bg-white/5 border-blue-500/30 text-white"
+                    >
+                      <SelectValue placeholder="Selecione o regime tributário" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {REGIMES_TRIBUTARIOS.map((regime) => (
+                        <SelectItem key={regime} value={regime}>
+                          {regime}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Porte */}
                 <div className="space-y-2">
                   <Label htmlFor="porte" className="text-gray-200">Porte</Label>
-                  <Input
-                    id="porte"
-                    data-testid="input-porte"
-                    value={formData.porte}
-                    onChange={(e) => setFormData({ ...formData, porte: e.target.value })}
-                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
-                  />
+                  <Select 
+                    value={formData.porte} 
+                    onValueChange={(value) => setFormData({ ...formData, porte: value })}
+                  >
+                    <SelectTrigger 
+                      data-testid="select-porte" 
+                      className="bg-white/5 border-blue-500/30 text-white"
+                    >
+                      <SelectValue placeholder="Selecione o porte" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PORTES.map((porte) => (
+                        <SelectItem key={porte} value={porte}>
+                          {porte}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Modalidade */}
+                <div className="space-y-2">
+                  <Label htmlFor="modalidade" className="text-gray-200">Modalidade</Label>
+                  <Select 
+                    value={formData.modalidade} 
+                    onValueChange={(value) => setFormData({ ...formData, modalidade: value })}
+                  >
+                    <SelectTrigger 
+                      data-testid="select-modalidade" 
+                      className="bg-white/5 border-blue-500/30 text-white"
+                    >
+                      <SelectValue placeholder="Selecione a modalidade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MODALIDADES.map((modalidade) => (
+                        <SelectItem key={modalidade} value={modalidade}>
+                          {modalidade}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Certificado Digital */}
+                <div className="space-y-2">
+                  <Label htmlFor="certificado" className="text-gray-200">Certificado Digital</Label>
+                  <Select 
+                    value={formData.certificado} 
+                    onValueChange={(value) => setFormData({ ...formData, certificado: value })}
+                  >
+                    <SelectTrigger 
+                      data-testid="select-certificado" 
+                      className="bg-white/5 border-blue-500/30 text-white"
+                    >
+                      <SelectValue placeholder="Possui certificado digital?" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {OPCOES_SIM_NAO.map((opcao) => (
+                        <SelectItem key={opcao} value={opcao}>
+                          {opcao}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Procuração */}
+                <div className="space-y-2">
+                  <Label htmlFor="procuracao" className="text-gray-200">Procuração</Label>
+                  <Select 
+                    value={formData.procuracao} 
+                    onValueChange={(value) => setFormData({ ...formData, procuracao: value })}
+                  >
+                    <SelectTrigger 
+                      data-testid="select-procuracao" 
+                      className="bg-white/5 border-blue-500/30 text-white"
+                    >
+                      <SelectValue placeholder="Possui procuração?" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {OPCOES_SIM_NAO.map((opcao) => (
+                        <SelectItem key={opcao} value={opcao}>
+                          {opcao}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Contrato */}
@@ -255,42 +420,6 @@ export default function CadastroCliente() {
                     value={formData.data_saida}
                     onChange={(e) => setFormData({ ...formData, data_saida: e.target.value })}
                     className="bg-white/5 border-blue-500/30 text-white"
-                  />
-                </div>
-
-                {/* Modalidade */}
-                <div className="space-y-2">
-                  <Label htmlFor="modalidade" className="text-gray-200">Modalidade</Label>
-                  <Input
-                    id="modalidade"
-                    data-testid="input-modalidade"
-                    value={formData.modalidade}
-                    onChange={(e) => setFormData({ ...formData, modalidade: e.target.value })}
-                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
-                  />
-                </div>
-
-                {/* Certificado */}
-                <div className="space-y-2">
-                  <Label htmlFor="certificado" className="text-gray-200">Certificado</Label>
-                  <Input
-                    id="certificado"
-                    data-testid="input-certificado"
-                    value={formData.certificado}
-                    onChange={(e) => setFormData({ ...formData, certificado: e.target.value })}
-                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
-                  />
-                </div>
-
-                {/* Procuração */}
-                <div className="space-y-2">
-                  <Label htmlFor="procuracao" className="text-gray-200">Procuração</Label>
-                  <Input
-                    id="procuracao"
-                    data-testid="input-procuracao"
-                    value={formData.procuracao}
-                    onChange={(e) => setFormData({ ...formData, procuracao: e.target.value })}
-                    className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
                   />
                 </div>
 
