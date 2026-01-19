@@ -149,9 +149,9 @@ export default function ListaClientes() {
               <div className="overflow-x-auto">
                 <div className={`min-w-full ${modoClaro ? 'bg-white' : ''}`}>
                   <table className="w-full border-collapse">
-                    <thead className={`sticky top-0 z-10 ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50' : ''}`} style={!modoClaro ? {backgroundColor: '#222B35'} : {}}>
+                    <thead className={`sticky top-0 z-10 ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50' : ''}`} style={!modoClaro ? {backgroundColor: '#16233b'} : {}}>
                       <tr className={modoClaro ? 'border-b-2 border-gray-200' : 'border-b border-blue-500/20'}>
-                        <th className={`sticky left-0 z-20 px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50 text-gray-800 border-r-2 border-gray-200' : 'border-r border-blue-500/20'}`} style={!modoClaro ? {backgroundColor: '#222B35', color: '#8EA9DB'} : {}}>
+                        <th className={`sticky left-0 z-20 px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50 text-gray-800 border-r-2 border-gray-200' : 'border-r border-blue-500/20'}`} style={!modoClaro ? {backgroundColor: '#16233b', color: '#8EA9DB'} : {}}>
                           Razão Social
                         </th>
                         <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Fantasia</th>
@@ -173,92 +173,113 @@ export default function ListaClientes() {
                       </tr>
                     </thead>
                     <tbody>
-                      {clientesFiltrados.map((cliente, index) => (
-                        <tr 
-                          key={cliente.id} 
-                          className={`
-                            ${modoClaro 
-                              ? `border-b border-gray-200 hover:bg-blue-50` 
-                              : 'border-b border-blue-500/20 hover:bg-white/5'
-                            } transition-colors duration-150 group
-                          `}
-                          style={!modoClaro ? {backgroundColor: index % 2 === 0 ? '#222B35' : '#1a2129'} : {backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb'}}
-                        >
-                          <td 
-                            className={`sticky left-0 z-10 px-4 py-3 font-medium whitespace-nowrap ${modoClaro ? 'text-gray-900 border-r-2 border-gray-200 group-hover:bg-blue-50' : 'text-white border-r border-blue-500/20'}`}
-                            style={!modoClaro ? {backgroundColor: index % 2 === 0 ? '#222B35' : '#1a2129'} : {}}
+                      {clientesFiltrados.map((cliente, index) => {
+                        const bgColorEven = modoClaro ? '#ffffff' : '#16233b';
+                        const bgColorOdd = modoClaro ? '#f9fafb' : '#0f1829';
+                        const bgColor = index % 2 === 0 ? bgColorEven : bgColorOdd;
+                        
+                        return (
+                          <tr 
+                            key={cliente.id} 
+                            className={`
+                              ${modoClaro 
+                                ? 'border-b border-gray-200' 
+                                : 'border-b border-blue-500/20'
+                              } transition-colors duration-150 group
+                            `}
+                            style={{backgroundColor: bgColor}}
+                            onMouseEnter={(e) => {
+                              const hoverColor = modoClaro ? '#dbeafe' : 'rgba(255, 255, 255, 0.05)';
+                              e.currentTarget.style.backgroundColor = hoverColor;
+                              const firstCell = e.currentTarget.querySelector('td:first-child');
+                              if (firstCell) {
+                                firstCell.style.backgroundColor = hoverColor;
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = bgColor;
+                              const firstCell = e.currentTarget.querySelector('td:first-child');
+                              if (firstCell) {
+                                firstCell.style.backgroundColor = bgColor;
+                              }
+                            }}
                           >
-                            {cliente.razao_social}
-                          </td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.fantasia || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.cnpj || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.ccm || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.natureza_juridica || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.regime_tributario || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.porte || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.modalidade || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.certificado || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.procuracao || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.contrato || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{formatarData(cliente.data_inicial)}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{formatarData(cliente.data_saida)}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.responsavel || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.telefone || '-'}</td>
-                          <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.email || '-'}</td>
-                          <td className="px-4 py-3 text-center whitespace-nowrap">
-                            <div className="flex gap-2 justify-center">
-                              {podeEditar && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => navigate(`/cadastro-cliente?id=${cliente.id}`)}
-                                  className={modoClaro 
-                                    ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100' 
-                                    : 'bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20'
-                                  }
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              )}
-                              {podeExcluir && (
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className={modoClaro 
-                                        ? 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100' 
-                                        : 'bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20'
-                                      }
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent className="glass-effect border-blue-500/20">
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle className="text-white">Confirmar Exclusão</AlertDialogTitle>
-                                      <AlertDialogDescription className="text-gray-300">
-                                        Tem certeza que deseja excluir o cliente <strong>{cliente.razao_social}</strong>?
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel className="bg-white/5 border-blue-500/30 text-white hover:bg-white/10">
-                                        Cancelar
-                                      </AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() => deletarCliente(cliente.id)}
-                                        className="bg-gradient-to-r from-red-500 to-red-600 text-white"
+                            <td 
+                              className={`sticky left-0 z-10 px-4 py-3 font-medium whitespace-nowrap ${modoClaro ? 'text-gray-900 border-r-2 border-gray-200' : 'text-white border-r border-blue-500/20'}`}
+                              style={{backgroundColor: bgColor}}
+                            >
+                              {cliente.razao_social}
+                            </td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.fantasia || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.cnpj || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.ccm || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.natureza_juridica || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.regime_tributario || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.porte || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.modalidade || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.certificado || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.procuracao || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.contrato || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{formatarData(cliente.data_inicial)}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{formatarData(cliente.data_saida)}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.responsavel || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.telefone || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.email || '-'}</td>
+                            <td className="px-4 py-3 text-center whitespace-nowrap">
+                              <div className="flex gap-2 justify-center">
+                                {podeEditar && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => navigate(`/cadastro-cliente?id=${cliente.id}`)}
+                                    className={modoClaro 
+                                      ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100' 
+                                      : 'bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20'
+                                    }
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                )}
+                                {podeExcluir && (
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className={modoClaro 
+                                          ? 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100' 
+                                          : 'bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20'
+                                        }
                                       >
-                                        Excluir
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent className="glass-effect border-blue-500/20">
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle className="text-white">Confirmar Exclusão</AlertDialogTitle>
+                                        <AlertDialogDescription className="text-gray-300">
+                                          Tem certeza que deseja excluir o cliente <strong>{cliente.razao_social}</strong>?
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel className="bg-white/5 border-blue-500/30 text-white hover:bg-white/10">
+                                          Cancelar
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() => deletarCliente(cliente.id)}
+                                          className="bg-gradient-to-r from-red-500 to-red-600 text-white"
+                                        >
+                                          Excluir
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
