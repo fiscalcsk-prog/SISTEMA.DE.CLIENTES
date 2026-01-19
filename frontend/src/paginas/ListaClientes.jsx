@@ -170,7 +170,7 @@ export default function ListaClientes() {
                         <TableCell className="text-gray-300">{cliente.ccm || '-'}</TableCell>
                         <TableCell className="text-gray-300">{cliente.responsavel || '-'}</TableCell>
                         <TableCell className="text-gray-300">{cliente.telefone || '-'}</TableCell>
-                        <TableCell className="text-gray-300 max-w-[200px] truncate">{cliente.e_mail || '-'}</TableCell>
+                        <TableCell className="text-gray-300 max-w-[200px] truncate">{cliente.email || '-'}</TableCell>
                         <TableCell className="text-gray-300">{cliente.modalidade || '-'}</TableCell>
                         <TableCell className="text-gray-300">{cliente.contrato || '-'}</TableCell>
                         <TableCell className="text-gray-300">{formatarData(cliente.data_inicial)}</TableCell>
