@@ -33,14 +33,20 @@ export default function ListaClientes() {
       const { data, error } = await supabase
         .from('clientes')
         .select('*')
-        .order('razao_social');
+        .order('razao_social', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao carregar clientes:', error);
+        throw error;
+      }
 
       setClientes(data || []);
       setClientesFiltrados(data || []);
     } catch (error) {
-      toast.error('Erro ao carregar clientes');
+      console.error('Erro detalhado:', error);
+      toast.error('Erro ao carregar clientes: ' + (error.message || 'Erro desconhecido'));
+      setClientes([]);
+      setClientesFiltrados([]);
     } finally {
       setCarregando(false);
     }
