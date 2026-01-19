@@ -149,27 +149,27 @@ export default function ListaClientes() {
               <div className="overflow-x-auto">
                 <div className={`min-w-full ${modoClaro ? 'bg-white' : ''}`}>
                   <table className="w-full border-collapse">
-                    <thead className={`sticky top-0 z-10 ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50' : 'bg-gray-900/50'}`}>
+                    <thead className={`sticky top-0 z-10 ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50' : ''}`} style={!modoClaro ? {backgroundColor: '#222B35'} : {}}>
                       <tr className={modoClaro ? 'border-b-2 border-gray-200' : 'border-b border-blue-500/20'}>
-                        <th className={`sticky left-0 z-20 px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50 text-gray-800 border-r-2 border-gray-200' : 'bg-gray-900/90 text-gray-200 border-r border-blue-500/20'}`}>
+                        <th className={`sticky left-0 z-20 px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50 text-gray-800 border-r-2 border-gray-200' : 'border-r border-blue-500/20'}`} style={!modoClaro ? {backgroundColor: '#222B35', color: '#8EA9DB'} : {}}>
                           Razão Social
                         </th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Fantasia</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>CNPJ/CPF</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>CCM</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Natureza Jurídica</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Regime Tributário</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Porte</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Modalidade</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Certificado</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Procuração</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Contrato</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Data Inicial</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Data de Saída</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Responsável</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Telefone</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>E-mail</th>
-                        <th className={`px-4 py-4 text-right text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>Ações</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Fantasia</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>CNPJ/CPF</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>CCM</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Natureza Jurídica</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Regime Tributário</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Porte</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Modalidade</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Certificado</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Procuração</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Contrato</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Data Inicial</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Data de Saída</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Responsável</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Telefone</th>
+                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>E-mail</th>
+                        <th className={`px-4 py-4 text-center text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Ações</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -178,12 +178,16 @@ export default function ListaClientes() {
                           key={cliente.id} 
                           className={`
                             ${modoClaro 
-                              ? `${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 border-b border-gray-200` 
+                              ? `border-b border-gray-200 hover:bg-blue-50` 
                               : 'border-b border-blue-500/20 hover:bg-white/5'
-                            } transition-colors duration-150
+                            } transition-colors duration-150 group
                           `}
+                          style={!modoClaro ? {backgroundColor: index % 2 === 0 ? '#222B35' : '#1a2129'} : {backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb'}}
                         >
-                          <td className={`sticky left-0 z-10 px-4 py-3 font-medium whitespace-nowrap ${modoClaro ? `${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} text-gray-900 border-r-2 border-gray-200` : 'bg-gray-900/95 text-white border-r border-blue-500/20'}`}>
+                          <td 
+                            className={`sticky left-0 z-10 px-4 py-3 font-medium whitespace-nowrap ${modoClaro ? 'text-gray-900 border-r-2 border-gray-200 group-hover:bg-blue-50' : 'text-white border-r border-blue-500/20'}`}
+                            style={!modoClaro ? {backgroundColor: index % 2 === 0 ? '#222B35' : '#1a2129'} : {}}
+                          >
                             {cliente.razao_social}
                           </td>
                           <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.fantasia || '-'}</td>
@@ -201,8 +205,8 @@ export default function ListaClientes() {
                           <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.responsavel || '-'}</td>
                           <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.telefone || '-'}</td>
                           <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.email || '-'}</td>
-                          <td className="px-4 py-3 text-right whitespace-nowrap">
-                            <div className="flex gap-2 justify-end">
+                          <td className="px-4 py-3 text-center whitespace-nowrap">
+                            <div className="flex gap-2 justify-center">
                               {podeEditar && (
                                 <Button
                                   variant="outline"
