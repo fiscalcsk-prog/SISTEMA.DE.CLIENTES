@@ -160,33 +160,34 @@ export default function ListaClientes() {
                     >
                       <tr className={modoClaro ? 'border-b-2 border-gray-200' : 'border-b border-blue-500/20'}>
                         <th 
-                          className="sticky left-0 z-20 px-4 py-4 text-left whitespace-nowrap border-r border-blue-500/20"
+                          className="sticky left-0 z-20 text-left whitespace-nowrap border-r border-blue-500/20"
                           style={{ 
                             fontSize: '15px', 
                             fontWeight: 'bold',
-                            color: modoClaro ? '#ffffff' : '#BDD7EE', /* MODO ESCURO: #BDD7EE | MODO CLARO: branco */
+                            color: modoClaro ? '#ffffff' : '#BDD7EE',
                             background: modoClaro 
                               ? '#1E293B' 
-                              : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)' /* Mesmo gradiente na primeira coluna */
+                              : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)',
+                            padding: '16px 24px' /* AUMENTAR LARGURA: mude de 16px 24px para 20px 32px (maior ainda) */
                           }}
                         >
                           Razão Social
                         </th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Fantasia</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>CNPJ/CPF</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>CCM</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Natureza Jurídica</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Regime Tributário</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Porte</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Modalidade</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Certificado</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Procuração</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Contrato</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Data Inicial</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Responsável</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Telefone</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>E-mail</th>
-                        <th className="px-4 py-4 text-center whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Ações</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Fantasia</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>CNPJ/CPF</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>CCM</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Natureza Jurídica</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Regime Tributário</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Porte</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Modalidade</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Certificado</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Procuração</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Contrato</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Data Inicial</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Responsável</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Telefone</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>E-mail</th>
+                        <th className="text-center whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Ações</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -225,35 +226,36 @@ export default function ListaClientes() {
                             }}
                           >
                             <td 
-                              className={`sticky left-0 px-4 py-3 whitespace-nowrap z-10 ${
+                              className={`sticky left-0 whitespace-nowrap z-10 ${
                                 modoClaro 
-                                  ? 'text-gray-900 border-r-2 border-gray-200' 
+                                  ? 'border-r-2 border-gray-200' 
                                   : 'border-r border-blue-500/20'
                               }`}
                               style={{
                                 backgroundColor: bgColor,
                                 fontSize: '12px',
                                 fontWeight: modoClaro ? 'normal' : '500',
-                                color: modoClaro ? '#1f2937' : '#ffffff' /* MODO ESCURO: texto BRANCO | MODO CLARO: cinza escuro */
+                                color: modoClaro ? '#1f2937' : '#ffffff',
+                                padding: '14px 24px' /* AUMENTAR LARGURA: mude de 14px 24px para 18px 32px (maior ainda) */
                               }}
                             >
                               {cliente.razao_social}
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.fantasia || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.cnpj || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.ccm || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.natureza_juridica || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.regime_tributario || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.porte || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.modalidade || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.certificado || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.procuracao || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.contrato || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{formatarData(cliente.data_inicial)}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.responsavel || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.telefone || '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.email || '-'}</td>
-                            <td className="px-4 py-3 text-center whitespace-nowrap">
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.fantasia || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.cnpj || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.ccm || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.natureza_juridica || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.regime_tributario || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.porte || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.modalidade || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.certificado || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.procuracao || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.contrato || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{formatarData(cliente.data_inicial)}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.responsavel || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.telefone || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.email || '-'}</td>
+                            <td className="text-center whitespace-nowrap" style={{ padding: '14px 24px' }}>
                               <div className="flex gap-2 justify-center">
                                 {podeEditar && (
                                   <Button
