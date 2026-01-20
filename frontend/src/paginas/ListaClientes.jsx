@@ -95,6 +95,91 @@ export default function ListaClientes() {
   const podeExcluir = usuario.permissoes?.excluir || usuario.tipo === 'ADM';
   const podeCadastrar = usuario.permissoes?.cadastrar || usuario.tipo === 'ADM';
 
+  // Função para renderizar badge de Modalidade
+  const renderModalidadeBadge = (modalidade) => {
+    if (!modalidade || modalidade === '-') return '-';
+    
+    const isProBono = modalidade.toLowerCase().includes('pró-bono') || modalidade.toLowerCase().includes('pro-bono');
+    const isPaga = modalidade.toLowerCase().includes('paga');
+    
+    if (isProBono) {
+      return (
+        <span style={{
+          display: 'inline-block',
+          padding: '4px 12px',
+          borderRadius: '12px',
+          fontSize: '11px',
+          fontWeight: '500',
+          backgroundColor: '#1e40af',
+          color: '#ffffff'
+        }}>
+          {modalidade}
+        </span>
+      );
+    }
+    
+    if (isPaga) {
+      return (
+        <span style={{
+          display: 'inline-block',
+          padding: '4px 12px',
+          borderRadius: '12px',
+          fontSize: '11px',
+          fontWeight: '500',
+          backgroundColor: '#16a34a',
+          color: '#ffffff'
+        }}>
+          {modalidade}
+        </span>
+      );
+    }
+    
+    return modalidade;
+  };
+
+  // Função para renderizar badge de Sim/Não (Certificado e Procuração)
+  const renderSimNaoBadge = (valor) => {
+    if (!valor || valor === '-') return '-';
+    
+    const valorLower = valor.toLowerCase();
+    const isSim = valorLower === 'sim';
+    const isNao = valorLower === 'não' || valorLower === 'nao';
+    
+    if (isSim) {
+      return (
+        <span style={{
+          display: 'inline-block',
+          padding: '4px 12px',
+          borderRadius: '12px',
+          fontSize: '11px',
+          fontWeight: '500',
+          backgroundColor: '#ea580c',
+          color: '#ffffff'
+        }}>
+          Sim
+        </span>
+      );
+    }
+    
+    if (isNao) {
+      return (
+        <span style={{
+          display: 'inline-block',
+          padding: '4px 12px',
+          borderRadius: '12px',
+          fontSize: '11px',
+          fontWeight: '500',
+          backgroundColor: '#dc2626',
+          color: '#ffffff'
+        }}>
+          Não
+        </span>
+      );
+    }
+    
+    return valor;
+  };
+
   return (
     <Layout>
       <div className="animate-fade-in" data-testid="lista-clientes" style={{ maxWidth: '100%', width: '100%', margin: '0', padding: '0 8px' }}> {/* OCUPA 100% - apenas 8px de padding lateral */}
@@ -247,9 +332,9 @@ export default function ListaClientes() {
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.natureza_juridica || '-'}</td>
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.regime_tributario || '-'}</td>
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.porte || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.modalidade || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.certificado || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.procuracao || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{renderModalidadeBadge(cliente.modalidade)}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{renderSimNaoBadge(cliente.certificado)}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{renderSimNaoBadge(cliente.procuracao)}</td>
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.contrato || '-'}</td>
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{formatarData(cliente.data_inicial)}</td>
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.responsavel || '-'}</td>
