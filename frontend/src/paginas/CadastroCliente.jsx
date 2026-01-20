@@ -12,11 +12,11 @@ import { supabase } from '@/lib/supabase';
 
 const NATUREZAS_JURIDICAS = [
   { grupo: 'Pessoas Jurídicas Empresariais', opcoes: [
-    'EI – Empresário Individual',
-    'SLU – Sociedade Limitada Unipessoal',
-    'LTDA – Sociedade Empresária Limitada',
-    'SA – Sociedade Anônima',
-    'SCP – Sociedade em Conta de Participação',
+    'EI',
+    'SLU',
+    'LTDA',
+    'SA',
+    'SCP',
     'Cooperativa',
     'Consórcio de Empresas'
   ]},
@@ -45,7 +45,7 @@ const REGIMES_TRIBUTARIOS = [
   'Lucro Real',
   'Lucro Presumido',
   'Simples Nacional',
-  'IMUNE/ISENTA'
+  'Imune/Isenta'
 ];
 
 const PORTES = [
@@ -57,13 +57,13 @@ const PORTES = [
 ];
 
 const MODALIDADES = [
-  'PRÓ-BONO',
-  'PAGA'
+  'Pró-Bono',
+  'Paga'
 ];
 
 const OPCOES_SIM_NAO = [
-  'SIM',
-  'NÃO'
+  'Sim',
+  'Não'
 ];
 
 export default function CadastroCliente() {
