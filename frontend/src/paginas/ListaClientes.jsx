@@ -152,30 +152,41 @@ export default function ListaClientes() {
                   <table className="w-full border-collapse">
                     <thead 
                       className="sticky top-0 z-10"
-                      style={{ backgroundColor: '#1E293B' }}
+                      style={{ 
+                        background: modoClaro 
+                          ? '#1E293B' 
+                          : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)' /* GRADIENTE MODO ESCURO: Mais claro em cima, mais escuro embaixo */
+                      }}
                     >
                       <tr className={modoClaro ? 'border-b-2 border-gray-200' : 'border-b border-blue-500/20'}>
                         <th 
-                          className="sticky left-0 z-20 px-4 py-4 text-left whitespace-nowrap text-white border-r border-blue-500/20"
-                          style={{ fontSize: '15px', fontWeight: 'bold', backgroundColor: '#1E293B' }}
+                          className="sticky left-0 z-20 px-4 py-4 text-left whitespace-nowrap border-r border-blue-500/20"
+                          style={{ 
+                            fontSize: '15px', 
+                            fontWeight: 'bold',
+                            color: modoClaro ? '#ffffff' : '#BDD7EE', /* MODO ESCURO: #BDD7EE | MODO CLARO: branco */
+                            background: modoClaro 
+                              ? '#1E293B' 
+                              : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)' /* Mesmo gradiente na primeira coluna */
+                          }}
                         >
                           Razão Social
                         </th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Fantasia</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>CNPJ/CPF</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>CCM</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Natureza Jurídica</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Regime Tributário</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Porte</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Modalidade</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Certificado</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Procuração</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Contrato</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Data Inicial</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Responsável</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Telefone</th>
-                        <th className="px-4 py-4 text-left whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>E-mail</th>
-                        <th className="px-4 py-4 text-center whitespace-nowrap text-white" style={{ fontSize: '15px', fontWeight: 'bold' }}>Ações</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Fantasia</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>CNPJ/CPF</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>CCM</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Natureza Jurídica</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Regime Tributário</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Porte</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Modalidade</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Certificado</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Procuração</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Contrato</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Data Inicial</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Responsável</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Telefone</th>
+                        <th className="px-4 py-4 text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>E-mail</th>
+                        <th className="px-4 py-4 text-center whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE' }}>Ações</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -217,30 +228,31 @@ export default function ListaClientes() {
                               className={`sticky left-0 px-4 py-3 whitespace-nowrap z-10 ${
                                 modoClaro 
                                   ? 'text-gray-900 border-r-2 border-gray-200' 
-                                  : 'text-white border-r border-blue-500/20'
+                                  : 'border-r border-blue-500/20'
                               }`}
                               style={{
                                 backgroundColor: bgColor,
                                 fontSize: '12px',
-                                fontWeight: modoClaro ? 'normal' : '500'
+                                fontWeight: modoClaro ? 'normal' : '500',
+                                color: modoClaro ? '#1f2937' : '#ffffff' /* MODO ESCURO: texto BRANCO | MODO CLARO: cinza escuro */
                               }}
                             >
                               {cliente.razao_social}
                             </td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.fantasia || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.cnpj || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.ccm || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.natureza_juridica || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.regime_tributario || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.porte || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.modalidade || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.certificado || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.procuracao || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.contrato || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{formatarData(cliente.data_inicial)}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.responsavel || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.telefone || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800' : 'text-gray-300'}`} style={{ fontSize: '12px', fontWeight: 'normal' }}>{cliente.email || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.fantasia || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.cnpj || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.ccm || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.natureza_juridica || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.regime_tributario || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.porte || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.modalidade || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.certificado || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.procuracao || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.contrato || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{formatarData(cliente.data_inicial)}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.responsavel || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.telefone || '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff' }}>{cliente.email || '-'}</td>
                             <td className="px-4 py-3 text-center whitespace-nowrap">
                               <div className="flex gap-2 justify-center">
                                 {podeEditar && (
