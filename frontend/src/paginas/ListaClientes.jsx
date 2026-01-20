@@ -178,7 +178,7 @@ export default function ListaClientes() {
                         const bgColorOdd = modoClaro ? '#f9fafb' : '#0f1829';
                         const bgColor = index % 2 === 0 ? bgColorEven : bgColorOdd;
                         
-                        return (
+                       return (
                           <tr 
                             key={cliente.id} 
                             className={`
@@ -205,8 +205,8 @@ export default function ListaClientes() {
                             }}
                           >
                             <td 
-                              className={`sticky left-0 z-10 px-4 py-3 font-medium whitespace-nowrap ${modoClaro ? 'text-gray-900 border-r-2 border-gray-200' : 'text-white border-r border-blue-500/20'}`}
-                              style={{backgroundColor: bgColor}}
+                              className={`sticky left-0 px-4 py-3 font-medium whitespace-nowrap ${modoClaro ? 'text-gray-900 border-r-2 border-gray-200' : 'text-white border-r border-blue-500/20'}`}
+                              style={modoClaro ? {backgroundColor: bgColor} : {backgroundColor: bgColor, zIndex: 11}}
                             >
                               {cliente.razao_social}
                             </td>
