@@ -148,7 +148,7 @@ export default function ListaClientes() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <div className={`min-w-full ${modoClaro ? 'bg-white' : 'bg-slate-900/95'}`}>
+                <div className={`min-w-full ${modoClaro ? 'bg-white' : 'bg-slate-900'}`}>
                   <table className="w-full border-collapse">
                     <thead 
                       className={`sticky top-0 z-10 ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50' : 'bg-slate-800'}`}
@@ -183,9 +183,13 @@ export default function ListaClientes() {
                     </thead>
                     <tbody>
                       {clientesFiltrados.map((cliente, index) => {
-                        const bgColorEven = modoClaro ? '#ffffff' : 'rgba(30, 41, 59, 0.95)';
-                        const bgColorOdd = modoClaro ? '#f9fafb' : 'rgba(15, 23, 42, 0.95)';
+                        // Cores sólidas (sem transparência)
+                        const bgColorEven = modoClaro ? '#ffffff' : '#1e293b';
+                        const bgColorOdd = modoClaro ? '#f9fafb' : '#0f172a';
                         const bgColor = index % 2 === 0 ? bgColorEven : bgColorOdd;
+                        
+                        // Cores de hover também sólidas
+                        const hoverColor = modoClaro ? '#dbeafe' : '#1e3a5f';
                         
                         return (
                           <tr 
@@ -198,7 +202,6 @@ export default function ListaClientes() {
                             `}
                             style={{backgroundColor: bgColor}}
                             onMouseEnter={(e) => {
-                              const hoverColor = modoClaro ? '#dbeafe' : 'rgba(59, 130, 246, 0.15)';
                               e.currentTarget.style.backgroundColor = hoverColor;
                               const firstCell = e.currentTarget.querySelector('td:first-child');
                               if (firstCell) {
