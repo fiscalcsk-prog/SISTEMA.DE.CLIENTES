@@ -97,7 +97,7 @@ export default function ListaClientes() {
 
   return (
     <Layout>
-      <div className="animate-fade-in" data-testid="lista-clientes" style={{ maxWidth: '98%', width: '100%', margin: '0 auto' }}> {/* MARGENS LATERAIS REDUZIDAS */}
+      <div className="animate-fade-in" data-testid="lista-clientes" style={{ maxWidth: '100%', width: '100%', margin: '0', padding: '0 8px' }}> {/* OCUPA 100% - apenas 8px de padding lateral */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
