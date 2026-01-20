@@ -152,24 +152,24 @@ export default function ListaClientes() {
                   <table className="w-full border-collapse">
                     <thead className={`sticky top-0 z-10 ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50' : ''}`} style={!modoClaro ? {backgroundColor: '#16233b'} : {}}>
                       <tr className={modoClaro ? 'border-b-2 border-gray-200' : 'border-b border-blue-500/20'}>
-                        <th className={`sticky left-0 z-20 px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50 text-gray-900 border-r-2 border-gray-200' : 'border-r border-blue-500/20'}`} style={!modoClaro ? {backgroundColor: '#16233b', color: '#8EA9DB'} : {}}>
+                        <th className={`sticky left-0 z-20 px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50 text-gray-900 border-r-2 border-gray-200' : 'border-r border-blue-500/20'}`} style={!modoClaro ? {backgroundColor: '#16233b', color: '#8EA9DB'} : {}}>
                           Razão Social
                         </th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Fantasia</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>CNPJ/CPF</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>CCM</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Natureza Jurídica</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Regime Tributário</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Porte</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Modalidade</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Certificado</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Procuração</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Contrato</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Data Inicial</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Responsável</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Telefone</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>E-mail</th>
-                        <th className={`px-4 py-4 text-center text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Ações</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Fantasia</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>CNPJ/CPF</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>CCM</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Natureza Jurídica</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Regime Tributário</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Porte</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Modalidade</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Certificado</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Procuração</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Contrato</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Data Inicial</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Responsável</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Telefone</th>
+                        <th className={`px-4 py-4 text-left text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>E-mail</th>
+                        <th className={`px-4 py-4 text-center text-base font-bold whitespace-nowrap ${modoClaro ? 'text-gray-900' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Ações</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -193,7 +193,13 @@ export default function ListaClientes() {
                               e.currentTarget.style.backgroundColor = hoverColor;
                               const firstCell = e.currentTarget.querySelector('td:first-child');
                               if (firstCell) {
-                                firstCell.style.backgroundColor = hoverColor;
+                                if (modoClaro) {
+                                  firstCell.style.backgroundColor = hoverColor;
+                                } else {
+                                  // No modo escuro, mantém o background sólido
+                                  firstCell.style.backgroundColor = hoverColor;
+                                  firstCell.style.opacity = '1';
+                                }
                               }
                             }}
                             onMouseLeave={(e) => {
@@ -201,29 +207,33 @@ export default function ListaClientes() {
                               const firstCell = e.currentTarget.querySelector('td:first-child');
                               if (firstCell) {
                                 firstCell.style.backgroundColor = bgColor;
+                                firstCell.style.opacity = '1';
                               }
                             }}
                           >
                             <td 
-                              className={`sticky left-0 px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-900 border-r-2 border-gray-200 text-base font-semibold' : 'text-white border-r border-blue-500/20 font-medium'}`}
-                              style={modoClaro ? {backgroundColor: bgColor} : {backgroundColor: bgColor, zIndex: 19}}
+                              className={`sticky left-0 px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-900 border-r-2 border-gray-200 text-base font-semibold' : 'text-white border-r border-blue-500/20'}`}
+                              style={modoClaro 
+                                ? {backgroundColor: bgColor} 
+                                : {backgroundColor: bgColor, zIndex: 19, position: 'relative'}
+                              }
                             >
                               {cliente.razao_social}
                             </td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.fantasia || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.cnpj || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.ccm || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.natureza_juridica || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.regime_tributario || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.porte || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.modalidade || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.certificado || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.procuracao || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.contrato || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{formatarData(cliente.data_inicial)}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.responsavel || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.telefone || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base font-semibold' : 'text-gray-300'}`}>{cliente.email || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.fantasia || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.cnpj || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.ccm || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.natureza_juridica || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.regime_tributario || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.porte || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.modalidade || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.certificado || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.procuracao || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.contrato || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{formatarData(cliente.data_inicial)}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.responsavel || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.telefone || '-'}</td>
+                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-800 text-base' : 'text-gray-300'}`}>{cliente.email || '-'}</td>
                             <td className="px-4 py-3 text-center whitespace-nowrap">
                               <div className="flex gap-2 justify-center">
                                 {podeEditar && (
