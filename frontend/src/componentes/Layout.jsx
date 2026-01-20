@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, Users, UserMinus, Settings, LogOut, UserPlus } from 'lucide-react';
+import { Home, Users, UserMinus, Settings, LogOut, UserPlus, Menu, X } from 'lucide-react';
 
 export default function Layout({ children }) {
+  const [menuAberto, setMenuAberto] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
@@ -11,6 +13,15 @@ export default function Layout({ children }) {
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
     navigate('/');
+  };
+
+  const toggleMenu = () => {
+    setMenuAberto(!menuAberto);
+  };
+
+  const navegarPara = (rota) => {
+    navigate(rota);
+    setMenuAberto(false); // Fecha o menu após navegar
   };
 
   const menuItems = [
@@ -50,29 +61,80 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, rgb(15, 26, 47) 0%, rgb(25, 40, 65) 50%, rgb(15, 26, 47) 100%)' }}>
+      
+      {/* Botão Hambúrguer */}
+      <button
+        onClick={toggleMenu}
+        className="fixed top-5 left-5 z-[1001] p-3 rounded-xl text-white transition-all duration-300 hover:scale-105"
+        style={{
+          background: 'linear-gradient(135deg, rgba(8, 15, 30, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)',
+          border: '1px solid rgba(96, 165, 250, 0.3)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(10px)'
+        }}
+        aria-label="Toggle menu"
+      >
+        {menuAberto ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Overlay (fundo escuro quando menu está aberto) */}
+      {menuAberto && (
+        <div
+          className="fixed inset-0 bg-black/60 z-[999] animate-fade-in"
+          style={{ backdropFilter: 'blur(2px)' }}
+          onClick={toggleMenu}
+        ></div>
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 glass-effect border-r border-blue-500/20 z-50">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+      <aside
+        className={`fixed left-0 top-0 h-full w-72 border-r border-blue-500/20 z-[1000] transition-all duration-400 ease-in-out ${
+          menuAberto ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        style={{
+          background: 'linear-gradient(180deg, rgba(8, 15, 30, 0.98) 0%, rgba(12, 20, 38, 0.98) 50%, rgba(8, 15, 30, 0.98) 100%)',
+          boxShadow: '4px 0 30px rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(15px)'
+        }}
+      >
+        {/* Header do Menu */}
+        <div 
+          className="p-6 border-b border-blue-500/15"
+          style={{
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.3) 100%)'
+          }}
+        >
+          <h2 
+            className="text-2xl font-bold mb-2" 
+            style={{ 
+              fontFamily: 'Space Grotesk, sans-serif',
+              background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
             Sistema de Controle
           </h2>
-          <p className="text-sm text-blue-300">Gestão de Clientes</p>
+          <p className="text-sm text-slate-400">Gestão de Clientes</p>
         </div>
 
-        <nav className="px-4 space-y-2">
+        {/* Menu de Navegação */}
+        <nav className="px-4 py-5 space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 280px)' }}>
           {menuItems.filter(item => item.mostrar).map((item) => {
             const Icon = item.icon;
             const ativo = estaAtivo(item.rota);
             return (
               <Button
                 key={item.rota}
-                onClick={() => navigate(item.rota)}
-                className={`w-full justify-start gap-3 transition-all ${
+                onClick={() => navegarPara(item.rota)}
+                className={`w-full justify-start gap-3 transition-all duration-300 ${
                   ativo
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                    : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white'
+                    ? 'bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-white border border-blue-500/50'
+                    : 'bg-transparent text-slate-300 hover:bg-blue-500/10 hover:text-white hover:translate-x-1 border border-transparent hover:border-blue-500/30'
                 }`}
                 data-testid={`menu-${item.rota.replace('/', '')}`}
+                style={ativo ? { boxShadow: '0 4px 15px rgba(59, 130, 246, 0.2)' } : {}}
               >
                 <Icon className="h-5 w-5" />
                 {item.label}
@@ -81,16 +143,25 @@ export default function Layout({ children }) {
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-500/20">
-          <div className="mb-4 p-3 bg-white/5 rounded-lg">
-            <p className="text-sm text-gray-300 mb-1">Logado como:</p>
-            <p className="text-white font-semibold">{usuario.nome}</p>
+        {/* Footer do Menu */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-500/15"
+          style={{
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.3) 100%)'
+          }}
+        >
+          <div 
+            className="mb-4 p-3 rounded-lg border border-blue-500/10"
+            style={{ background: 'rgba(30, 41, 59, 0.4)' }}
+          >
+            <p className="text-xs text-slate-400 mb-1">Logado como:</p>
+            <p className="text-white font-semibold text-sm">{usuario.nome}</p>
             <p className="text-xs text-blue-300">{usuario.tipo}</p>
           </div>
           <Button
             onClick={handleLogout}
             variant="outline"
-            className="w-full bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20"
+            className="w-full bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20 font-semibold"
             data-testid="btn-logout"
           >
             <LogOut className="mr-2 h-4 w-4" />
@@ -100,7 +171,7 @@ export default function Layout({ children }) {
       </aside>
 
       {/* Main Content */}
-      <main className="ml-64 p-8">
+      <main className="p-8 pt-20">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>
