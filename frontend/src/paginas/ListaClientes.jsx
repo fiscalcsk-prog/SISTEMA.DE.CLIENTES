@@ -236,7 +236,7 @@ export default function ListaClientes() {
                                 fontSize: '12px',
                                 fontWeight: modoClaro ? 'normal' : '500',
                                 color: modoClaro ? '#1f2937' : '#ffffff',
-                                padding: '14px 24px' /* AUMENTAR LARGURA: mude de 14px 24px para 18px 32px (maior ainda) */
+                                padding: '10px 20px' /* AUMENTAR LARGURA: mude de 14px 24px para 18px 32px (maior ainda) */
                               }}
                             >
                               {cliente.razao_social}
