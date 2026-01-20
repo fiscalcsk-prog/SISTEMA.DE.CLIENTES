@@ -1,56 +1,58 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
 import { Edit, Trash2, Search, UserPlus, Sun, Moon } from 'lucide-react';
-import Layout from '@/componentes/Layout';
-import { supabase } from '@/lib/supabase';
 
 export default function ListaClientes() {
-  const navigate = useNavigate();
-  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-
-  const [clientes, setClientes] = useState([]);
-  const [clientesFiltrados, setClientesFiltrados] = useState([]);
+  const [clientes, setClientes] = useState([
+    {
+      id: 1,
+      razao_social: 'Empresa ABC Ltda',
+      fantasia: 'ABC',
+      cnpj: '12.345.678/0001-90',
+      ccm: '123456',
+      natureza_juridica: 'Ltda',
+      regime_tributario: 'Simples Nacional',
+      porte: 'ME',
+      modalidade: 'Presencial',
+      certificado: 'A1',
+      procuracao: 'Sim',
+      contrato: 'Ativo',
+      data_inicial: '2024-01-15',
+      responsavel: 'João Silva',
+      telefone: '(11) 98765-4321',
+      email: 'contato@abc.com.br'
+    },
+    {
+      id: 2,
+      razao_social: 'XYZ Comércio e Serviços S.A.',
+      fantasia: 'XYZ',
+      cnpj: '98.765.432/0001-10',
+      ccm: '654321',
+      natureza_juridica: 'S.A.',
+      regime_tributario: 'Lucro Real',
+      porte: 'EPP',
+      modalidade: 'Online',
+      certificado: 'A3',
+      procuracao: 'Não',
+      contrato: 'Ativo',
+      data_inicial: '2023-06-20',
+      responsavel: 'Maria Santos',
+      telefone: '(11) 91234-5678',
+      email: 'contato@xyz.com.br'
+    }
+  ]);
+  
+  const [clientesFiltrados, setClientesFiltrados] = useState(clientes);
   const [busca, setBusca] = useState('');
-  const [carregando, setCarregando] = useState(true);
+  const [carregando, setCarregando] = useState(false);
   const [modoClaro, setModoClaro] = useState(false);
-
-  useEffect(() => {
-    carregarClientes();
-  }, []);
 
   useEffect(() => {
     filtrarClientes();
   }, [busca, clientes]);
-
-  const carregarClientes = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('clientes')
-        .select('*')
-        .is('data_saida', null)
-        .order('razao_social', { ascending: true });
-
-      if (error) {
-        console.error('Erro ao carregar clientes:', error);
-        throw error;
-      }
-
-      setClientes(data || []);
-      setClientesFiltrados(data || []);
-    } catch (error) {
-      console.error('Erro detalhado:', error);
-      toast.error('Erro ao carregar clientes: ' + (error.message || 'Erro desconhecido'));
-      setClientes([]);
-      setClientesFiltrados([]);
-    } finally {
-      setCarregando(false);
-    }
-  };
 
   const filtrarClientes = () => {
     if (!busca.trim()) {
@@ -71,19 +73,7 @@ export default function ListaClientes() {
   };
 
   const deletarCliente = async (clienteId) => {
-    try {
-      const { error } = await supabase
-        .from('clientes')
-        .delete()
-        .eq('id', clienteId);
-
-      if (error) throw error;
-
-      toast.success('Cliente deletado com sucesso!');
-      carregarClientes();
-    } catch (error) {
-      toast.error('Erro ao deletar cliente');
-    }
+    setClientes(clientes.filter(c => c.id !== clienteId));
   };
 
   const formatarData = (data) => {
@@ -91,13 +81,13 @@ export default function ListaClientes() {
     return new Date(data).toLocaleDateString('pt-BR');
   };
 
-  const podeEditar = usuario.permissoes?.editar || usuario.tipo === 'ADM';
-  const podeExcluir = usuario.permissoes?.excluir || usuario.tipo === 'ADM';
-  const podeCadastrar = usuario.permissoes?.cadastrar || usuario.tipo === 'ADM';
+  const podeEditar = true;
+  const podeExcluir = true;
+  const podeCadastrar = true;
 
   return (
-    <Layout>
-      <div className="animate-fade-in" data-testid="lista-clientes" style={{ maxWidth: '100%', width: '100%' }}> {/* LARGURA MÁXIMA DA PÁGINA */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
+      <div className="animate-fade-in mx-auto" style={{ maxWidth: '98%', width: '100%' }}>
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
@@ -107,7 +97,6 @@ export default function ListaClientes() {
           </div>
           {podeCadastrar && (
             <Button
-              onClick={() => navigate('/cadastro-cliente')}
               className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
             >
               <UserPlus className="mr-2 h-4 w-4" />
@@ -116,7 +105,7 @@ export default function ListaClientes() {
           )}
         </div>
 
-        <Card className="glass-effect border-blue-500/20">
+        <Card className="border-blue-500/20 bg-slate-800/50 backdrop-blur">
           <CardHeader>
             <div className="flex gap-4 items-center">
               <div className="relative flex-1">
@@ -155,7 +144,7 @@ export default function ListaClientes() {
                       style={{ 
                         background: modoClaro 
                           ? '#1E293B' 
-                          : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)' /* GRADIENTE MODO ESCURO: Mais claro em cima, mais escuro embaixo */
+                          : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)'
                       }}
                     >
                       <tr className={modoClaro ? 'border-b-2 border-gray-200' : 'border-b border-blue-500/20'}>
@@ -168,36 +157,33 @@ export default function ListaClientes() {
                             background: modoClaro 
                               ? '#1E293B' 
                               : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)',
-                            padding: '16px 24px' /* AUMENTAR LARGURA: mude de 16px 24px para 20px 32px (maior ainda) */
+                            padding: '16px 16px'
                           }}
                         >
                           Razão Social
                         </th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Fantasia</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>CNPJ/CPF</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>CCM</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Natureza Jurídica</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Regime Tributário</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Porte</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Modalidade</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Certificado</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Procuração</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Contrato</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Data Inicial</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Responsável</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Telefone</th>
-                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>E-mail</th>
-                        <th className="text-center whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Ações</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Fantasia</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>CNPJ/CPF</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>CCM</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Natureza Jurídica</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Regime Tributário</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Porte</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Modalidade</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Certificado</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Procuração</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Contrato</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Data Inicial</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Responsável</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Telefone</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>E-mail</th>
+                        <th className="text-center whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 16px' }}>Ações</th>
                       </tr>
                     </thead>
                     <tbody>
                       {clientesFiltrados.map((cliente, index) => {
-                        // Cores sólidas (sem transparência)
                         const bgColorEven = modoClaro ? '#ffffff' : '#333F4F';
                         const bgColorOdd = modoClaro ? '#f9fafb' : '#2a3544';
                         const bgColor = index % 2 === 0 ? bgColorEven : bgColorOdd;
-                        
-                        // Cores de hover também sólidas
                         const hoverColor = modoClaro ? '#dbeafe' : '#3d4f63';
                         
                         return (
@@ -236,32 +222,31 @@ export default function ListaClientes() {
                                 fontSize: '12px',
                                 fontWeight: modoClaro ? 'normal' : '500',
                                 color: modoClaro ? '#1f2937' : '#ffffff',
-                                padding: '14px 24px' /* AUMENTAR LARGURA: mude de 14px 24px para 18px 32px (maior ainda) */
+                                padding: '14px 16px'
                               }}
                             >
                               {cliente.razao_social}
                             </td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.fantasia || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.cnpj || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.ccm || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.natureza_juridica || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.regime_tributario || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.porte || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.modalidade || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.certificado || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.procuracao || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.contrato || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{formatarData(cliente.data_inicial)}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.responsavel || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.telefone || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.email || '-'}</td>
-                            <td className="text-center whitespace-nowrap" style={{ padding: '14px 24px' }}>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.fantasia || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.cnpj || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.ccm || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.natureza_juridica || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.regime_tributario || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.porte || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.modalidade || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.certificado || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.procuracao || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.contrato || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{formatarData(cliente.data_inicial)}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.responsavel || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.telefone || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 16px' }}>{cliente.email || '-'}</td>
+                            <td className="text-center whitespace-nowrap" style={{ padding: '14px 16px' }}>
                               <div className="flex gap-2 justify-center">
                                 {podeEditar && (
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => navigate(`/cadastro-cliente?id=${cliente.id}`)}
                                     className={modoClaro 
                                       ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100' 
                                       : 'bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20'
@@ -284,7 +269,7 @@ export default function ListaClientes() {
                                         <Trash2 className="h-4 w-4" />
                                       </Button>
                                     </AlertDialogTrigger>
-                                    <AlertDialogContent className="glass-effect border-blue-500/20">
+                                    <AlertDialogContent className="bg-slate-800 border-blue-500/20">
                                       <AlertDialogHeader>
                                         <AlertDialogTitle className="text-white">Confirmar Exclusão</AlertDialogTitle>
                                         <AlertDialogDescription className="text-gray-300">
@@ -318,6 +303,6 @@ export default function ListaClientes() {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </div>
   );
 }
