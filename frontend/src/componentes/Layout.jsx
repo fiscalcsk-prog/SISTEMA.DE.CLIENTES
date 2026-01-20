@@ -62,25 +62,10 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, rgb(15, 26, 47) 0%, rgb(25, 40, 65) 50%, rgb(15, 26, 47) 100%)' }}>
       
-      {/* Botão Hambúrguer */}
-      <button
-        onClick={toggleMenu}
-        className="fixed top-5 left-5 z-[1001] p-3 rounded-xl text-white transition-all duration-300 hover:scale-105"
-        style={{
-          background: 'linear-gradient(135deg, rgba(8, 15, 30, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)',
-          border: '1px solid rgba(96, 165, 250, 0.3)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(10px)'
-        }}
-        aria-label="Toggle menu"
-      >
-        {menuAberto ? <X size={24} /> : <Menu size={24} />}
-      </button>
-
-      {/* Overlay (fundo escuro quando menu está aberto) */}
+      {/* Overlay (fundo escuro quando menu está aberto) - CLICA PARA FECHAR */}
       {menuAberto && (
         <div
-          className="fixed inset-0 bg-black/60 z-[999] animate-fade-in"
+          className="fixed inset-0 bg-black/60 z-[999] animate-fade-in cursor-pointer"
           style={{ backdropFilter: 'blur(2px)' }}
           onClick={toggleMenu}
         ></div>
@@ -97,15 +82,24 @@ export default function Layout({ children }) {
           backdropFilter: 'blur(15px)'
         }}
       >
-        {/* Header do Menu */}
+        {/* Header do Menu com Botão de Fechar */}
         <div 
-          className="p-6 border-b border-blue-500/15"
+          className="p-6 border-b border-blue-500/15 relative"
           style={{
             background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.3) 100%)'
           }}
         >
+          {/* Botão X para fechar (dentro do menu) */}
+          <button
+            onClick={toggleMenu}
+            className="absolute top-4 right-4 p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200"
+            aria-label="Fechar menu"
+          >
+            <X size={20} />
+          </button>
+
           <h2 
-            className="text-2xl font-bold mb-2" 
+            className="text-2xl font-bold mb-2 pr-10" 
             style={{ 
               fontFamily: 'Space Grotesk, sans-serif',
               background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
@@ -169,6 +163,23 @@ export default function Layout({ children }) {
           </Button>
         </div>
       </aside>
+
+      {/* Botão Hambúrguer - SÓ APARECE QUANDO MENU ESTÁ FECHADO */}
+      {!menuAberto && (
+        <button
+          onClick={toggleMenu}
+          className="fixed top-5 left-5 z-50 p-3 rounded-xl text-white transition-all duration-300 hover:scale-105"
+          style={{
+            background: 'linear-gradient(135deg, rgba(8, 15, 30, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)',
+            border: '1px solid rgba(96, 165, 250, 0.3)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(10px)'
+          }}
+          aria-label="Abrir menu"
+        >
+          <Menu size={24} />
+        </button>
+      )}
 
       {/* Main Content */}
       <main className="p-8 pt-20">
