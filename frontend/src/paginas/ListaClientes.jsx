@@ -106,12 +106,15 @@ export default function ListaClientes() {
       return (
         <span style={{
           display: 'inline-block',
-          padding: '4px 12px',
-          borderRadius: '12px',
+          padding: '5px 14px',
+          borderRadius: '16px',
           fontSize: '11px',
-          fontWeight: '500',
-          backgroundColor: '#1e40af',
-          color: '#ffffff'
+          fontWeight: '600',
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.25) 100%)',
+          border: '1.5px solid rgba(59, 130, 246, 0.4)',
+          color: '#60a5fa',
+          boxShadow: '0 2px 8px rgba(59, 130, 246, 0.15)',
+          letterSpacing: '0.3px'
         }}>
           {modalidade}
         </span>
@@ -122,12 +125,15 @@ export default function ListaClientes() {
       return (
         <span style={{
           display: 'inline-block',
-          padding: '4px 12px',
-          borderRadius: '12px',
+          padding: '5px 14px',
+          borderRadius: '16px',
           fontSize: '11px',
-          fontWeight: '500',
-          backgroundColor: '#16a34a',
-          color: '#ffffff'
+          fontWeight: '600',
+          background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.25) 100%)',
+          border: '1.5px solid rgba(34, 197, 94, 0.4)',
+          color: '#4ade80',
+          boxShadow: '0 2px 8px rgba(34, 197, 94, 0.15)',
+          letterSpacing: '0.3px'
         }}>
           {modalidade}
         </span>
@@ -149,12 +155,15 @@ export default function ListaClientes() {
       return (
         <span style={{
           display: 'inline-block',
-          padding: '4px 12px',
-          borderRadius: '12px',
+          padding: '5px 14px',
+          borderRadius: '16px',
           fontSize: '11px',
-          fontWeight: '500',
-          backgroundColor: '#ea580c',
-          color: '#ffffff'
+          fontWeight: '600',
+          background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(234, 88, 12, 0.25) 100%)',
+          border: '1.5px solid rgba(249, 115, 22, 0.4)',
+          color: '#fb923c',
+          boxShadow: '0 2px 8px rgba(249, 115, 22, 0.15)',
+          letterSpacing: '0.3px'
         }}>
           Sim
         </span>
@@ -165,12 +174,15 @@ export default function ListaClientes() {
       return (
         <span style={{
           display: 'inline-block',
-          padding: '4px 12px',
-          borderRadius: '12px',
+          padding: '5px 14px',
+          borderRadius: '16px',
           fontSize: '11px',
-          fontWeight: '500',
-          backgroundColor: '#dc2626',
-          color: '#ffffff'
+          fontWeight: '600',
+          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.25) 100%)',
+          border: '1.5px solid rgba(239, 68, 68, 0.4)',
+          color: '#f87171',
+          boxShadow: '0 2px 8px rgba(239, 68, 68, 0.15)',
+          letterSpacing: '0.3px'
         }}>
           Não
         </span>
