@@ -20,18 +20,44 @@ export default function Dashboard() {
 
   const carregarUltimosClientes = async () => {
     try {
-      const { data, error } = await supabase
+      // Buscar todos os clientes ativos, ordenados por data de criação
+      const { data: clientesData, error: clientesError } = await supabase
         .from('clientes')
-        .select('id, razao_social, data_inicial, created_at, created_by')
+        .select('*')
         .is('data_saida', null)
         .order('created_at', { ascending: false })
         .limit(10);
 
-      if (error) throw error;
+      if (clientesError) throw clientesError;
 
-      setUltimosClientes(data || []);
+      // Buscar informações dos usuários que cadastraram
+      const usuariosIds = [...new Set(clientesData?.map(c => c.usuario_cadastro).filter(Boolean))];
+      
+      let usuariosMap = {};
+      if (usuariosIds.length > 0) {
+        const { data: usuariosData, error: usuariosError } = await supabase
+          .from('usuarios')
+          .select('id, nome')
+          .in('id', usuariosIds);
+
+        if (!usuariosError && usuariosData) {
+          usuariosMap = usuariosData.reduce((acc, user) => {
+            acc[user.id] = user.nome;
+            return acc;
+          }, {});
+        }
+      }
+
+      // Adicionar nome do usuário aos clientes
+      const clientesComUsuario = clientesData?.map(cliente => ({
+        ...cliente,
+        nome_usuario: usuariosMap[cliente.usuario_cadastro] || 'Sistema'
+      })) || [];
+
+      setUltimosClientes(clientesComUsuario);
     } catch (error) {
       console.error('Erro ao carregar últimos clientes:', error);
+      setUltimosClientes([]);
     } finally {
       setCarregando(false);
     }
@@ -252,7 +278,7 @@ export default function Dashboard() {
                                 padding: '14px 24px' 
                               }}
                             >
-                              {cliente.created_by || '-'}
+                              {cliente.nome_usuario || 'Sistema'}
                             </td>
                             <td 
                               className="whitespace-nowrap" 
