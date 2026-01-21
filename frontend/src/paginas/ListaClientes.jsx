@@ -1,25 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Edit, Trash2, Search, UserPlus, Sun, Moon, Upload, Download } from 'lucide-react';
+import { Edit, Trash2, Search, UserPlus, Sun, Moon } from 'lucide-react';
 import Layout from '@/componentes/Layout';
 import { supabase } from '@/lib/supabase';
 
 export default function ListaClientes() {
   const navigate = useNavigate();
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-  const fileInputRef = useRef(null);
 
   const [clientes, setClientes] = useState([]);
   const [clientesFiltrados, setClientesFiltrados] = useState([]);
   const [busca, setBusca] = useState('');
   const [carregando, setCarregando] = useState(true);
   const [modoClaro, setModoClaro] = useState(false);
-  const [importando, setImportando] = useState(false);
 
   useEffect(() => {
     carregarClientes();
@@ -93,270 +91,13 @@ export default function ListaClientes() {
     return new Date(data).toLocaleDateString('pt-BR');
   };
 
-  // Função para exportar CSV
-  const exportarCSV = () => {
-    try {
-      // Cabeçalhos do CSV
-      const headers = [
-        'razao_social',
-        'fantasia',
-        'cnpj',
-        'ccm',
-        'natureza_juridica',
-        'regime_tributario',
-        'porte',
-        'modalidade',
-        'certificado',
-        'procuracao',
-        'contrato',
-        'data_inicial',
-        'responsavel',
-        'telefone',
-        'email'
-      ];
-
-      // Criar linhas do CSV
-      const linhas = clientesFiltrados.map(cliente => {
-        return headers.map(header => {
-          let valor = cliente[header] || '';
-          
-          // Formatar data se necessário
-          if (header === 'data_inicial' && valor) {
-            valor = new Date(valor).toLocaleDateString('pt-BR');
-          }
-          
-          // Escapar ponto e vírgula e adicionar aspas se necessário
-          if (valor.toString().includes(';') || valor.toString().includes('"') || valor.toString().includes('\n')) {
-            valor = `"${valor.toString().replace(/"/g, '""')}"`;
-          }
-          
-          return valor;
-        }).join(';');
-      });
-
-      // Adicionar cabeçalhos
-      const csv = [headers.join(';'), ...linhas].join('\n');
-
-      // Criar blob e fazer download
-      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      
-      link.setAttribute('href', url);
-      link.setAttribute('download', `clientes_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      toast.success(`${clientesFiltrados.length} cliente(s) exportado(s) com sucesso!`);
-    } catch (error) {
-      console.error('Erro ao exportar CSV:', error);
-      toast.error('Erro ao exportar CSV');
-    }
-  };
-
-  // Função para importar CSV
-  const importarCSV = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    setImportando(true);
-
-    try {
-      const text = await file.text();
-      const linhas = text.split('\n').filter(linha => linha.trim());
-      
-      if (linhas.length < 2) {
-        toast.error('Arquivo CSV vazio ou inválido');
-        return;
-      }
-
-      // Pegar cabeçalhos
-      const headers = linhas[0].split(';').map(h => h.trim().replace(/"/g, ''));
-      
-      // Processar cada linha
-      const clientesParaInserir = [];
-      const erros = [];
-
-      for (let i = 1; i < linhas.length; i++) {
-        try {
-          const valores = linhas[i].split(';').map(v => v.trim().replace(/^"|"$/g, ''));
-          const cliente = {};
-
-          headers.forEach((header, index) => {
-            const valor = valores[index] || null;
-            
-            // Converter data se necessário
-            if (header === 'data_inicial' && valor) {
-              // Aceitar formato DD/MM/YYYY
-              const partes = valor.split('/');
-              if (partes.length === 3) {
-                cliente[header] = `${partes[2]}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
-              } else {
-                cliente[header] = valor;
-              }
-            } else {
-              cliente[header] = valor;
-            }
-          });
-
-          // Validar campos obrigatórios
-          if (!cliente.razao_social) {
-            erros.push(`Linha ${i + 1}: Razão Social é obrigatória`);
-            continue;
-          }
-
-          clientesParaInserir.push(cliente);
-        } catch (error) {
-          erros.push(`Linha ${i + 1}: ${error.message}`);
-        }
-      }
-
-      if (erros.length > 0) {
-        console.warn('Erros na importação:', erros);
-      }
-
-      if (clientesParaInserir.length === 0) {
-        toast.error('Nenhum cliente válido para importar');
-        return;
-      }
-
-      // Inserir no banco de dados
-      const { data, error } = await supabase
-        .from('clientes')
-        .insert(clientesParaInserir)
-        .select();
-
-      if (error) {
-        console.error('Erro ao inserir clientes:', error);
-        throw error;
-      }
-
-      toast.success(`${clientesParaInserir.length} cliente(s) importado(s) com sucesso!`);
-      
-      if (erros.length > 0) {
-        toast.warning(`${erros.length} linha(s) com erro foram ignoradas`);
-      }
-
-      carregarClientes();
-    } catch (error) {
-      console.error('Erro ao importar CSV:', error);
-      toast.error('Erro ao importar CSV: ' + (error.message || 'Erro desconhecido'));
-    } finally {
-      setImportando(false);
-      // Limpar input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
   const podeEditar = usuario.permissoes?.editar || usuario.tipo === 'ADM';
   const podeExcluir = usuario.permissoes?.excluir || usuario.tipo === 'ADM';
   const podeCadastrar = usuario.permissoes?.cadastrar || usuario.tipo === 'ADM';
 
-  // Função para renderizar badge de Modalidade
-  const renderModalidadeBadge = (modalidade) => {
-    if (!modalidade || modalidade === '-') return '-';
-    
-    const isProBono = modalidade.toLowerCase().includes('pró-bono') || modalidade.toLowerCase().includes('pro-bono');
-    const isPaga = modalidade.toLowerCase().includes('paga');
-    
-    if (isProBono) {
-      return (
-        <span style={{
-          display: 'inline-block',
-          padding: '5px 14px',
-          borderRadius: '16px',
-          fontSize: '11px',
-          fontWeight: '600',
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.25) 100%)',
-          border: '1.5px solid rgba(59, 130, 246, 0.4)',
-          color: '#60a5fa',
-          boxShadow: '0 2px 8px rgba(59, 130, 246, 0.15)',
-          letterSpacing: '0.3px'
-        }}>
-          {modalidade}
-        </span>
-      );
-    }
-    
-    if (isPaga) {
-      return (
-        <span style={{
-          display: 'inline-block',
-          padding: '5px 14px',
-          borderRadius: '16px',
-          fontSize: '11px',
-          fontWeight: '600',
-          background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.25) 100%)',
-          border: '1.5px solid rgba(34, 197, 94, 0.4)',
-          color: '#4ade80',
-          boxShadow: '0 2px 8px rgba(34, 197, 94, 0.15)',
-          letterSpacing: '0.3px'
-        }}>
-          {modalidade}
-        </span>
-      );
-    }
-    
-    return modalidade;
-  };
-
-  // Função para renderizar badge de Sim/Não (Certificado e Procuração)
-  const renderSimNaoBadge = (valor) => {
-    if (!valor || valor === '-') return '-';
-    
-    const valorLower = valor.toLowerCase();
-    const isSim = valorLower === 'sim';
-    const isNao = valorLower === 'não' || valorLower === 'nao';
-    
-    if (isSim) {
-      return (
-        <span style={{
-          display: 'inline-block',
-          padding: '5px 14px',
-          borderRadius: '16px',
-          fontSize: '11px',
-          fontWeight: '600',
-          background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(234, 88, 12, 0.25) 100%)',
-          border: '1.5px solid rgba(249, 115, 22, 0.4)',
-          color: '#fb923c',
-          boxShadow: '0 2px 8px rgba(249, 115, 22, 0.15)',
-          letterSpacing: '0.3px'
-        }}>
-          Sim
-        </span>
-      );
-    }
-    
-    if (isNao) {
-      return (
-        <span style={{
-          display: 'inline-block',
-          padding: '5px 14px',
-          borderRadius: '16px',
-          fontSize: '11px',
-          fontWeight: '600',
-          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.25) 100%)',
-          border: '1.5px solid rgba(239, 68, 68, 0.4)',
-          color: '#f87171',
-          boxShadow: '0 2px 8px rgba(239, 68, 68, 0.15)',
-          letterSpacing: '0.3px'
-        }}>
-          Não
-        </span>
-      );
-    }
-    
-    return valor;
-  };
-
   return (
     <Layout>
-      <div className="animate-fade-in" data-testid="lista-clientes" style={{ maxWidth: '100%', width: '100%', margin: '0', padding: '0 8px' }}>
+      <div className="animate-fade-in" data-testid="lista-clientes" style={{ maxWidth: '100%', width: '100%', margin: '0', padding: '0' }}> {/* SEM PADDING LATERAL */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
@@ -364,42 +105,15 @@ export default function ListaClientes() {
             </h1>
             <p className="text-gray-300 text-lg">{clientesFiltrados.length} cliente(s) encontrado(s)</p>
           </div>
-          <div className="flex gap-2">
-            {podeCadastrar && (
-              <>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".csv"
-                  onChange={importarCSV}
-                  style={{ display: 'none' }}
-                />
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={importando}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  {importando ? 'Importando...' : 'Importar CSV'}
-                </Button>
-                <Button
-                  onClick={exportarCSV}
-                  disabled={clientesFiltrados.length === 0}
-                  className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Exportar CSV
-                </Button>
-                <Button
-                  onClick={() => navigate('/cadastro-cliente')}
-                  className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
-                >
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Novo Cliente
-                </Button>
-              </>
-            )}
-          </div>
+          {podeCadastrar && (
+            <Button
+              onClick={() => navigate('/cadastro-cliente')}
+              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              Novo Cliente
+            </Button>
+          )}
         </div>
 
         <Card className="glass-effect border-blue-500/20">
@@ -441,7 +155,7 @@ export default function ListaClientes() {
                       style={{ 
                         background: modoClaro 
                           ? '#1E293B' 
-                          : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)'
+                          : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)' /* GRADIENTE MODO ESCURO: Mais claro em cima, mais escuro embaixo */
                       }}
                     >
                       <tr className={modoClaro ? 'border-b-2 border-gray-200' : 'border-b border-blue-500/20'}>
@@ -454,7 +168,7 @@ export default function ListaClientes() {
                             background: modoClaro 
                               ? '#1E293B' 
                               : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)',
-                            padding: '16px 24px'
+                            padding: '16px 24px' /* AUMENTAR LARGURA: mude de 16px 24px para 20px 32px (maior ainda) */
                           }}
                         >
                           Razão Social
@@ -478,9 +192,12 @@ export default function ListaClientes() {
                     </thead>
                     <tbody>
                       {clientesFiltrados.map((cliente, index) => {
+                        // Cores sólidas (sem transparência)
                         const bgColorEven = modoClaro ? '#ffffff' : '#333F4F';
                         const bgColorOdd = modoClaro ? '#f9fafb' : '#2a3544';
                         const bgColor = index % 2 === 0 ? bgColorEven : bgColorOdd;
+                        
+                        // Cores de hover também sólidas
                         const hoverColor = modoClaro ? '#dbeafe' : '#3d4f63';
                         
                         return (
@@ -519,7 +236,7 @@ export default function ListaClientes() {
                                 fontSize: '12px',
                                 fontWeight: modoClaro ? 'normal' : '500',
                                 color: modoClaro ? '#1f2937' : '#ffffff',
-                                padding: '14px 24px'
+                                padding: '14px 24px' /* AUMENTAR LARGURA: mude de 14px 24px para 18px 32px (maior ainda) */
                               }}
                             >
                               {cliente.razao_social}
@@ -530,9 +247,9 @@ export default function ListaClientes() {
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.natureza_juridica || '-'}</td>
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.regime_tributario || '-'}</td>
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.porte || '-'}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{renderModalidadeBadge(cliente.modalidade)}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{renderSimNaoBadge(cliente.certificado)}</td>
-                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{renderSimNaoBadge(cliente.procuracao)}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.modalidade || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.certificado || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.procuracao || '-'}</td>
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.contrato || '-'}</td>
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{formatarData(cliente.data_inicial)}</td>
                             <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.responsavel || '-'}</td>
