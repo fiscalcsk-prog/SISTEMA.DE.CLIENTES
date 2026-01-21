@@ -189,7 +189,7 @@ export default function ListaClientes() {
 
   return (
     <Layout>
-      <div style={{ width: '100%', padding: '0 10px' }}>
+      <div style={{ width: '100%', padding: '0 1px' }}>
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Clientes Ativos</h1>
