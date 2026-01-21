@@ -110,9 +110,106 @@ export default function ListaExClientes() {
   const podeEditar = usuario.permissoes?.editar || usuario.tipo === 'ADM';
   const podeExcluir = usuario.permissoes?.excluir || usuario.tipo === 'ADM';
 
+  // Função para renderizar badge de Modalidade
+  const renderModalidadeBadge = (modalidade) => {
+    if (!modalidade || modalidade === '-') return '-';
+    
+    const isProBono = modalidade.toLowerCase().includes('pró-bono') || modalidade.toLowerCase().includes('pro-bono');
+    const isPaga = modalidade.toLowerCase().includes('paga');
+    
+    if (isProBono) {
+      return (
+        <span style={{
+          display: 'inline-block',
+          padding: '5px 14px',
+          borderRadius: '16px',
+          fontSize: '11px',
+          fontWeight: '600',
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.25) 100%)',
+          border: '1.5px solid rgba(59, 130, 246, 0.4)',
+          color: '#60a5fa',
+          boxShadow: '0 2px 8px rgba(59, 130, 246, 0.15)',
+          letterSpacing: '0.3px'
+        }}>
+          {modalidade}
+        </span>
+      );
+    }
+    
+    if (isPaga) {
+      return (
+        <span style={{
+          display: 'inline-block',
+          padding: '5px 14px',
+          borderRadius: '16px',
+          fontSize: '11px',
+          fontWeight: '600',
+          background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.25) 100%)',
+          border: '1.5px solid rgba(34, 197, 94, 0.4)',
+          color: '#4ade80',
+          boxShadow: '0 2px 8px rgba(34, 197, 94, 0.15)',
+          letterSpacing: '0.3px'
+        }}>
+          {modalidade}
+        </span>
+      );
+    }
+    
+    return modalidade;
+  };
+
+  // Função para renderizar badge de Sim/Não (Certificado e Procuração)
+  const renderSimNaoBadge = (valor) => {
+    if (!valor || valor === '-') return '-';
+    
+    const valorLower = valor.toLowerCase();
+    const isSim = valorLower === 'sim';
+    const isNao = valorLower === 'não' || valorLower === 'nao';
+    
+    if (isSim) {
+      return (
+        <span style={{
+          display: 'inline-block',
+          padding: '5px 14px',
+          borderRadius: '16px',
+          fontSize: '11px',
+          fontWeight: '600',
+          background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(234, 88, 12, 0.25) 100%)',
+          border: '1.5px solid rgba(249, 115, 22, 0.4)',
+          color: '#fb923c',
+          boxShadow: '0 2px 8px rgba(249, 115, 22, 0.15)',
+          letterSpacing: '0.3px'
+        }}>
+          Sim
+        </span>
+      );
+    }
+    
+    if (isNao) {
+      return (
+        <span style={{
+          display: 'inline-block',
+          padding: '5px 14px',
+          borderRadius: '16px',
+          fontSize: '11px',
+          fontWeight: '600',
+          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.25) 100%)',
+          border: '1.5px solid rgba(239, 68, 68, 0.4)',
+          color: '#f87171',
+          boxShadow: '0 2px 8px rgba(239, 68, 68, 0.15)',
+          letterSpacing: '0.3px'
+        }}>
+          Não
+        </span>
+      );
+    }
+    
+    return valor;
+  };
+
   return (
     <Layout>
-      <div className="animate-fade-in" data-testid="lista-ex-clientes">
+      <div className="animate-fade-in" data-testid="lista-ex-clientes" style={{ maxWidth: '100%', width: '100%', margin: '0', padding: '0 8px' }}>
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
             Ex-Clientes
@@ -153,36 +250,55 @@ export default function ListaExClientes() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <div className={`min-w-full ${modoClaro ? 'bg-white' : ''}`}>
+                <div className="min-w-full" style={{ backgroundColor: modoClaro ? '#ffffff' : '#333F4F' }}>
                   <table className="w-full border-collapse">
-                    <thead className={`sticky top-0 z-10 ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50' : ''}`} style={!modoClaro ? {backgroundColor: '#16233b'} : {}}>
+                    <thead 
+                      className="sticky top-0 z-10"
+                      style={{ 
+                        background: modoClaro 
+                          ? '#1E293B' 
+                          : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)'
+                      }}
+                    >
                       <tr className={modoClaro ? 'border-b-2 border-gray-200' : 'border-b border-blue-500/20'}>
-                        <th className={`sticky left-0 z-20 px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'bg-gradient-to-r from-slate-50 to-gray-50 text-gray-800 border-r-2 border-gray-200' : 'border-r border-blue-500/20'}`} style={!modoClaro ? {backgroundColor: '#16233b', color: '#8EA9DB'} : {}}>
+                        <th 
+                          className="sticky left-0 z-20 text-left whitespace-nowrap border-r border-blue-500/20"
+                          style={{ 
+                            fontSize: '15px', 
+                            fontWeight: 'bold',
+                            color: modoClaro ? '#ffffff' : '#BDD7EE',
+                            background: modoClaro 
+                              ? '#1E293B' 
+                              : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)',
+                            padding: '16px 24px'
+                          }}
+                        >
                           Razão Social
                         </th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Fantasia</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>CNPJ/CPF</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>CCM</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Natureza Jurídica</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Regime Tributário</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Porte</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Modalidade</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Certificado</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Procuração</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Contrato</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Data Inicial</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Data de Saída</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Responsável</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Telefone</th>
-                        <th className={`px-4 py-4 text-left text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>E-mail</th>
-                        <th className={`px-4 py-4 text-center text-sm font-semibold whitespace-nowrap ${modoClaro ? 'text-gray-700' : ''}`} style={!modoClaro ? {color: '#8EA9DB'} : {}}>Ações</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Fantasia</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>CNPJ/CPF</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>CCM</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Natureza Jurídica</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Regime Tributário</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Porte</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Modalidade</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Certificado</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Procuração</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Contrato</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Data Inicial</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Data de Saída</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Responsável</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Telefone</th>
+                        <th className="text-left whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>E-mail</th>
+                        <th className="text-center whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 'bold', color: modoClaro ? '#ffffff' : '#BDD7EE', padding: '16px 24px' }}>Ações</th>
                       </tr>
                     </thead>
                     <tbody>
                       {clientesFiltrados.map((cliente, index) => {
-                        const bgColorEven = modoClaro ? '#ffffff' : '#16233b';
-                        const bgColorOdd = modoClaro ? '#f9fafb' : '#0f1829';
+                        const bgColorEven = modoClaro ? '#ffffff' : '#333F4F';
+                        const bgColorOdd = modoClaro ? '#f9fafb' : '#2a3544';
                         const bgColor = index % 2 === 0 ? bgColorEven : bgColorOdd;
+                        const hoverColor = modoClaro ? '#dbeafe' : '#3d4f63';
                         
                         return (
                           <tr 
@@ -196,7 +312,6 @@ export default function ListaExClientes() {
                             `}
                             style={{backgroundColor: bgColor}}
                             onMouseEnter={(e) => {
-                              const hoverColor = modoClaro ? '#dbeafe' : 'rgba(255, 255, 255, 0.05)';
                               e.currentTarget.style.backgroundColor = hoverColor;
                               const firstCell = e.currentTarget.querySelector('td:first-child');
                               if (firstCell) {
@@ -212,27 +327,37 @@ export default function ListaExClientes() {
                             }}
                           >
                             <td 
-                              className={`sticky left-0 z-10 px-4 py-3 font-medium whitespace-nowrap ${modoClaro ? 'text-gray-900 border-r-2 border-gray-200' : 'text-white border-r border-blue-500/20'}`}
-                              style={{backgroundColor: bgColor}}
+                              className={`sticky left-0 whitespace-nowrap z-10 ${
+                                modoClaro 
+                                  ? 'border-r-2 border-gray-200' 
+                                  : 'border-r border-blue-500/20'
+                              }`}
+                              style={{
+                                backgroundColor: bgColor,
+                                fontSize: '12px',
+                                fontWeight: modoClaro ? 'normal' : '500',
+                                color: modoClaro ? '#1f2937' : '#ffffff',
+                                padding: '14px 24px'
+                              }}
                             >
                               {cliente.razao_social}
                             </td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.fantasia || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.cnpj || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.ccm || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.natureza_juridica || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.regime_tributario || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.porte || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.modalidade || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.certificado || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.procuracao || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.contrato || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{formatarData(cliente.data_inicial)}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-red-700 font-medium' : 'text-red-300 font-medium'}`}>{formatarData(cliente.data_saida)}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.responsavel || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.telefone || '-'}</td>
-                            <td className={`px-4 py-3 whitespace-nowrap ${modoClaro ? 'text-gray-700' : 'text-gray-300'}`}>{cliente.email || '-'}</td>
-                            <td className="px-4 py-3 text-center whitespace-nowrap">
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.fantasia || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.cnpj || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.ccm || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.natureza_juridica || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.regime_tributario || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.porte || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{renderModalidadeBadge(cliente.modalidade)}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{renderSimNaoBadge(cliente.certificado)}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{renderSimNaoBadge(cliente.procuracao)}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.contrato || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{formatarData(cliente.data_inicial)}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#dc2626' : '#f87171', padding: '14px 24px' }}>{formatarData(cliente.data_saida)}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.responsavel || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.telefone || '-'}</td>
+                            <td className="whitespace-nowrap" style={{ fontSize: '12px', fontWeight: 'normal', color: modoClaro ? '#1f2937' : '#ffffff', padding: '14px 24px' }}>{cliente.email || '-'}</td>
+                            <td className="text-center whitespace-nowrap" style={{ padding: '14px 24px' }}>
                               <div className="flex gap-2 justify-center">
                                 {podeEditar && (
                                   <Button
