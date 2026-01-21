@@ -190,7 +190,7 @@ export default function ListaClientes() {
   return (
     <Layout>
       <div style={{ width: '100%', padding: 0, margin: 0 }}> {/* ZERO PADDING - Largura total */}
-        <div style={{ padding: '0 15px', marginBottom: '24px' }}> {/* Padding APENAS no cabeçalho */}
+        <div style={{ padding: '0 10px', marginBottom: '20px' }}> {/* Padding APENAS no cabeçalho */}
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Clientes Ativos</h1>
