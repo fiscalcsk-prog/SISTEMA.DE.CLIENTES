@@ -182,8 +182,8 @@ export default function Layout({ children }) {
       )}
 
       {/* Main Content */}
-      <main className="p-8 pt-20">
-        <div className="max-w-7xl mx-auto">
+      <main style={{ padding: '80px 0 0 0', width: '100%', margin: 0 }}> {/* ZERO PADDING - Ocupa 100% da tela */}
+        <div style={{ width: '100%', padding: 0, margin: 0 }}>
           {children}
         </div>
       </main>
