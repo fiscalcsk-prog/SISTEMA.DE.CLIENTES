@@ -214,7 +214,7 @@ export default function ListaClientes() {
           </div>
         </div>
 
-        <Card className="glass-effect border-blue-500/20" style={{ margin: '0 15px' }}> {/* Margem APENAS no Card */}
+        <Card className="glass-effect border-blue-500/20" style={{ margin: '0 8px' }}> {/* Margem APENAS no Card */}
           <CardHeader>
             <div className="flex gap-4 items-center">
               <div className="relative flex-1">
