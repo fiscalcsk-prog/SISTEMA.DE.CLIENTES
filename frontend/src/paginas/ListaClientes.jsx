@@ -189,13 +189,14 @@ export default function ListaClientes() {
 
   return (
     <Layout>
-      <div style={{ width: '100%', padding: '0 1px' }}>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Clientes Ativos</h1>
-            <p className="text-gray-300 text-lg">{clientesFiltrados.length} cliente(s) encontrado(s)</p>
-          </div>
-          <div className="flex gap-2">
+      <div style={{ width: '100%', padding: 0, margin: 0 }}> {/* ZERO PADDING - Largura total */}
+        <div style={{ padding: '0 15px', marginBottom: '24px' }}> {/* Padding APENAS no cabeçalho */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Clientes Ativos</h1>
+              <p className="text-gray-300 text-lg">{clientesFiltrados.length} cliente(s) encontrado(s)</p>
+            </div>
+            <div className="flex gap-2">
             {podeCadastrar && (
               <>
                 <input ref={fileInputRef} type="file" accept=".csv" onChange={importarCSV} style={{ display: 'none' }} />
@@ -213,7 +214,7 @@ export default function ListaClientes() {
           </div>
         </div>
 
-        <Card className="glass-effect border-blue-500/20">
+        <Card className="glass-effect border-blue-500/20" style={{ margin: '0 15px' }}> {/* Margem APENAS no Card */}
           <CardHeader>
             <div className="flex gap-4 items-center">
               <div className="relative flex-1">
@@ -231,8 +232,8 @@ export default function ListaClientes() {
             ) : clientesFiltrados.length === 0 ? (
               <div className="text-center py-8 text-gray-400">{busca ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}</div>
             ) : (
-              <div style={{ height: 'calc(100vh - 350px)', overflow: 'auto', position: 'relative' }}>
-                <table className="w-full border-collapse" style={{ backgroundColor: modoClaro ? '#ffffff' : '#333F4F' }}>
+              <div style={{ height: 'calc(100vh - 350px)', overflow: 'auto', position: 'relative', width: '100%' }}> {/* Largura 100% */}
+                <table style={{ width: '100%', minWidth: '100%', borderCollapse: 'collapse', backgroundColor: modoClaro ? '#ffffff' : '#333F4F' }}> {/* Tabela 100% largura */}
                   <thead style={{ position: 'sticky', top: 0, zIndex: 100, background: modoClaro ? '#1E293B' : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)' }}>
                     <tr className={modoClaro ? 'border-b-2 border-gray-200' : 'border-b border-blue-500/20'}>
                       <th style={{position:'sticky',left:0,zIndex:101,fontSize:'15px',fontWeight:'bold',color:modoClaro?'#fff':'#BDD7EE',background:modoClaro?'#1E293B':'linear-gradient(to bottom, #222B35 0%, #10151A 100%)',padding:'16px 24px',textAlign:'left',whiteSpace:'nowrap',borderRight:'1px solid rgba(96,165,250,0.2)'}}>Razão Social</th>
@@ -308,6 +309,7 @@ export default function ListaClientes() {
           </CardContent>
         </Card>
       </div>
+      </div> {/* Fecha div wrapper */}
     </Layout>
   );
 }
