@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, UserPlus, UserMinus, Settings, Sun, Moon } from 'lucide-react';
+import { Users, UserPlus, UserMinus, Settings, Sun, Moon, Calendar, User, Building2 } from 'lucide-react';
 import Layout from '@/componentes/Layout';
 import { supabase } from '@/lib/supabase';
 
@@ -14,27 +14,38 @@ export default function Dashboard() {
   const [carregando, setCarregando] = useState(true);
   const [modoClaro, setModoClaro] = useState(false);
 
-  // ✅ CORREÇÃO: Recarrega a lista quando a página fica visível novamente
+  // ✅ Recarrega automaticamente quando a página fica visível
   useEffect(() => {
     carregarUltimosClientes();
 
-    // Adiciona listener para quando a página fica visível (volta de outra aba/página)
+    // Recarrega ao voltar para a aba
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         carregarUltimosClientes();
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // ✅ Recarrega quando volta para a página (focus)
+    const handleFocus = () => {
+      carregarUltimosClientes();
+    };
 
-    // Cleanup
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    // ✅ Atualiza a cada 30 segundos automaticamente
+    const intervalo = setInterval(() => {
+      carregarUltimosClientes();
+    }, 30000); // 30 segundos
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(intervalo);
     };
   }, []);
 
   const carregarUltimosClientes = async () => {
-    setCarregando(true);
     try {
       // Buscar todos os clientes ativos, ordenados por data de criação
       const { data: clientesData, error: clientesError } = await supabase
@@ -53,12 +64,12 @@ export default function Dashboard() {
       if (usuariosIds.length > 0) {
         const { data: usuariosData, error: usuariosError } = await supabase
           .from('usuarios')
-          .select('id, nome')
+          .select('id, username')
           .in('id', usuariosIds);
 
         if (!usuariosError && usuariosData) {
           usuariosMap = usuariosData.reduce((acc, user) => {
-            acc[user.id] = user.nome;
+            acc[user.id] = user.username;
             return acc;
           }, {});
         }
@@ -86,7 +97,14 @@ export default function Dashboard() {
 
   const formatarDataHora = (data) => {
     if (!data) return '-';
-    return new Date(data).toLocaleString('pt-BR');
+    const date = new Date(data);
+    return date.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const cards = [
@@ -130,13 +148,13 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className="animate-fade-in" data-testid="dashboard">
+      <div className="animate-fade-in px-6 py-8" data-testid="dashboard">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
               Dashboard
             </h1>
-            <p className="text-gray-300 text-lg">Bem-vindo(a), {usuario.nome}</p>
+            <p className="text-gray-300 text-lg">Bem-vindo(a), {usuario.username}</p>
           </div>
           <Button
             variant="outline"
@@ -173,161 +191,129 @@ export default function Dashboard() {
           })}
         </div>
 
-        {/* Tabela dos Últimos 10 Clientes Cadastrados */}
-        <Card className="glass-effect border-blue-500/20">
-          <CardHeader>
-            <CardTitle className="text-2xl text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              Últimos Clientes Cadastrados
-            </CardTitle>
-            <CardDescription className="text-gray-300">
-              Os 10 clientes mais recentes no sistema
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            {carregando ? (
-              <div className="text-center py-8 text-gray-400">Carregando...</div>
-            ) : ultimosClientes.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
-                Nenhum cliente cadastrado ainda
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <div className="min-w-full" style={{ backgroundColor: modoClaro ? '#ffffff' : '#333F4F' }}>
-                  <table className="w-full border-collapse">
-                    <thead 
-                      className="sticky top-0 z-10"
-                      style={{ 
-                        background: modoClaro 
-                          ? '#1E293B' 
-                          : 'linear-gradient(to bottom, #222B35 0%, #10151A 100%)'
-                      }}
-                    >
-                      <tr className={modoClaro ? 'border-b-2 border-gray-200' : 'border-b border-blue-500/20'}>
-                        <th 
-                          className="text-left whitespace-nowrap"
-                          style={{ 
-                            fontSize: '15px', 
-                            fontWeight: 'bold',
-                            color: modoClaro ? '#ffffff' : '#BDD7EE',
-                            padding: '16px 24px'
-                          }}
-                        >
-                          Razão Social
-                        </th>
-                        <th 
-                          className="text-left whitespace-nowrap" 
-                          style={{ 
-                            fontSize: '15px', 
-                            fontWeight: 'bold', 
-                            color: modoClaro ? '#ffffff' : '#BDD7EE', 
-                            padding: '16px 24px' 
-                          }}
-                        >
-                          Cadastrado Por
-                        </th>
-                        <th 
-                          className="text-left whitespace-nowrap" 
-                          style={{ 
-                            fontSize: '15px', 
-                            fontWeight: 'bold', 
-                            color: modoClaro ? '#ffffff' : '#BDD7EE', 
-                            padding: '16px 24px' 
-                          }}
-                        >
-                          Data do Cadastro
-                        </th>
-                        <th 
-                          className="text-left whitespace-nowrap" 
-                          style={{ 
-                            fontSize: '15px', 
-                            fontWeight: 'bold', 
-                            color: modoClaro ? '#ffffff' : '#BDD7EE', 
-                            padding: '16px 24px' 
-                          }}
-                        >
-                          Data Inicial Cliente
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {ultimosClientes.map((cliente, index) => {
-                        const bgColorEven = modoClaro ? '#ffffff' : '#333F4F';
-                        const bgColorOdd = modoClaro ? '#f9fafb' : '#2a3544';
-                        const bgColor = index % 2 === 0 ? bgColorEven : bgColorOdd;
-                        const hoverColor = modoClaro ? '#dbeafe' : '#3d4f63';
-                        
-                        return (
-                          <tr 
-                            key={cliente.id}
-                            className={`
-                              ${modoClaro 
-                                ? 'border-b border-gray-200' 
-                                : 'border-b border-blue-500/20'
-                              } transition-colors duration-150 cursor-pointer
-                            `}
-                            style={{backgroundColor: bgColor}}
-                            onClick={() => navigate(`/cadastro-cliente?id=${cliente.id}`)}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = hoverColor;
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = bgColor;
-                            }}
-                          >
-                            <td 
-                              className="whitespace-nowrap" 
-                              style={{ 
-                                fontSize: '13px', 
-                                fontWeight: modoClaro ? '500' : '500',
-                                color: modoClaro ? '#1f2937' : '#ffffff', 
-                                padding: '14px 24px' 
-                              }}
-                            >
-                              {cliente.razao_social}
-                            </td>
-                            <td 
-                              className="whitespace-nowrap" 
-                              style={{ 
-                                fontSize: '13px', 
-                                fontWeight: 'normal', 
-                                color: modoClaro ? '#1f2937' : '#ffffff', 
-                                padding: '14px 24px' 
-                              }}
-                            >
-                              {cliente.nome_usuario || 'Sistema'}
-                            </td>
-                            <td 
-                              className="whitespace-nowrap" 
-                              style={{ 
-                                fontSize: '13px', 
-                                fontWeight: 'normal', 
-                                color: modoClaro ? '#1f2937' : '#ffffff', 
-                                padding: '14px 24px' 
-                              }}
-                            >
-                              {formatarDataHora(cliente.created_at)}
-                            </td>
-                            <td 
-                              className="whitespace-nowrap" 
-                              style={{ 
-                                fontSize: '13px', 
-                                fontWeight: 'normal', 
-                                color: modoClaro ? '#1f2937' : '#ffffff', 
-                                padding: '14px 24px' 
-                              }}
-                            >
-                              {formatarData(cliente.data_inicial)}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* Cards dos Últimos 10 Clientes Cadastrados */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                Últimos Clientes Cadastrados
+              </h2>
+              <p className="text-gray-300 text-sm mt-1">
+                Os 10 clientes mais recentes no sistema
+              </p>
+            </div>
+            <Button
+              onClick={carregarUltimosClientes}
+              variant="outline"
+              size="sm"
+              className="bg-white/5 border-blue-500/30 text-white hover:bg-white/10"
+            >
+              🔄 Atualizar
+            </Button>
+          </div>
+
+          {carregando ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              <p className="text-gray-400 mt-4">Carregando...</p>
+            </div>
+          ) : ultimosClientes.length === 0 ? (
+            <Card className="glass-effect border-blue-500/20">
+              <CardContent className="py-12 text-center">
+                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-400 text-lg">Nenhum cliente cadastrado ainda</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {ultimosClientes.map((cliente, index) => (
+                <Card
+                  key={cliente.id}
+                  className="glass-effect border-blue-500/20 hover:border-blue-500/40 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                  onClick={() => navigate(`/cadastro-cliente?id=${cliente.id}`)}
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg text-white mb-1 line-clamp-1">
+                          {cliente.razao_social}
+                        </CardTitle>
+                        {cliente.fantasia && (
+                          <CardDescription className="text-gray-400 text-sm line-clamp-1">
+                            {cliente.fantasia}
+                          </CardDescription>
+                        )}
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 ml-2">
+                        <Building2 className="h-5 w-5 text-white" />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {/* Cadastrado por */}
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                        <User className="h-4 w-4 text-purple-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-gray-400 text-xs">Cadastrado por</p>
+                        <p className="text-white font-medium truncate">{cliente.nome_usuario}</p>
+                      </div>
+                    </div>
+
+                    {/* Data do cadastro */}
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="h-4 w-4 text-blue-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-gray-400 text-xs">Data do cadastro</p>
+                        <p className="text-white font-medium">{formatarDataHora(cliente.created_at)}</p>
+                      </div>
+                    </div>
+
+                    {/* Data inicial */}
+                    {cliente.data_inicial && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                          <Calendar className="h-4 w-4 text-green-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-gray-400 text-xs">Início como cliente</p>
+                          <p className="text-white font-medium">{formatarData(cliente.data_inicial)}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Informações adicionais */}
+                    <div className="pt-2 border-t border-blue-500/10 flex flex-wrap gap-2">
+                      {cliente.regime_tributario && (
+                        <span className="px-2 py-1 bg-blue-500/10 text-blue-300 text-xs rounded-full">
+                          {cliente.regime_tributario}
+                        </span>
+                      )}
+                      {cliente.porte && (
+                        <span className="px-2 py-1 bg-purple-500/10 text-purple-300 text-xs rounded-full">
+                          {cliente.porte}
+                        </span>
+                      )}
+                      {cliente.modalidade && (
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          cliente.modalidade === 'Pró-Bono' 
+                            ? 'bg-orange-500/10 text-orange-300' 
+                            : 'bg-green-500/10 text-green-300'
+                        }`}>
+                          {cliente.modalidade}
+                        </span>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </Layout>
   );
