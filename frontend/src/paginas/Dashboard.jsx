@@ -14,11 +14,27 @@ export default function Dashboard() {
   const [carregando, setCarregando] = useState(true);
   const [modoClaro, setModoClaro] = useState(false);
 
+  // ✅ CORREÇÃO: Recarrega a lista quando a página fica visível novamente
   useEffect(() => {
     carregarUltimosClientes();
+
+    // Adiciona listener para quando a página fica visível (volta de outra aba/página)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        carregarUltimosClientes();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const carregarUltimosClientes = async () => {
+    setCarregando(true);
     try {
       // Buscar todos os clientes ativos, ordenados por data de criação
       const { data: clientesData, error: clientesError } = await supabase
