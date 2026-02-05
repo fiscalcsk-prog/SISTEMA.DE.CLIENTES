@@ -95,10 +95,8 @@ export default function CadastroCliente() {
 
   // Função para formatar CNPJ/CPF automaticamente
   const formatarCNPJCPF = (valor) => {
-    // Remove tudo que não é número
     const apenasNumeros = valor.replace(/\D/g, '');
     
-    // Se tem 11 dígitos ou menos, formata como CPF
     if (apenasNumeros.length <= 11) {
       return apenasNumeros
         .replace(/(\d{3})(\d)/, '$1.$2')
@@ -106,7 +104,6 @@ export default function CadastroCliente() {
         .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     }
     
-    // Se tem mais de 11 dígitos, formata como CNPJ
     return apenasNumeros
       .replace(/(\d{2})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d)/, '$1.$2')
@@ -114,34 +111,27 @@ export default function CadastroCliente() {
       .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
   };
 
-  // Função para formatar telefone (celular ou fixo)
   const formatarTelefone = (valor) => {
-    // Remove tudo que não é número
     const apenasNumeros = valor.replace(/\D/g, '');
     
-    // Se tem 11 dígitos, formata como celular: (00) 00000-0000
     if (apenasNumeros.length === 11) {
       return apenasNumeros
         .replace(/(\d{2})(\d)/, '($1) $2')
         .replace(/(\d{5})(\d{4})$/, '$1-$2');
     }
     
-    // Se tem 10 dígitos, formata como fixo: (00) 0000-0000
     if (apenasNumeros.length === 10) {
       return apenasNumeros
         .replace(/(\d{2})(\d)/, '($1) $2')
         .replace(/(\d{4})(\d{4})$/, '$1-$2');
     }
     
-    // Formatação progressiva enquanto digita
     if (apenasNumeros.length > 2) {
       let formatted = apenasNumeros.replace(/(\d{2})(\d)/, '($1) $2');
       
       if (apenasNumeros.length > 6) {
-        // Assume celular se já tem mais de 6 dígitos
         formatted = formatted.replace(/(\d{5})(\d)/, '$1-$2');
       } else if (apenasNumeros.length > 5) {
-        // Pode ser fixo
         formatted = formatted.replace(/(\d{4})(\d)/, '$1-$2');
       }
       
@@ -195,13 +185,15 @@ export default function CadastroCliente() {
     e.preventDefault();
     setCarregando(true);
 
+    console.log('🟢 INICIANDO CADASTRO/ATUALIZAÇÃO');
+
     try {
-      // ✅ CORREÇÃO: Pegar o ID do usuário logado
       const usuarioLogado = JSON.parse(localStorage.getItem('usuario') || '{}');
       
-      console.log('🔍 DEBUG - Usuário logado:', usuarioLogado); // DEBUG
+      console.log('👤 Usuário logado:', usuarioLogado);
+      console.log('📝 Modo edição:', modoEdicao);
+      console.log('🆔 Cliente ID:', clienteId);
       
-      // Garantir que todos os campos sejam strings
       const dadosParaSalvar = {
         razao_social: String(formData.razao_social || ''),
         fantasia: String(formData.fantasia || ''),
@@ -221,53 +213,81 @@ export default function CadastroCliente() {
         email: String(formData.email || '')
       };
 
+      console.log('📦 Dados base preparados:', dadosParaSalvar);
+
       if (modoEdicao) {
-        console.log('📝 Atualizando cliente:', clienteId); // DEBUG
+        console.log('✏️ MODO EDIÇÃO - Atualizando cliente...');
         
-        const { error } = await supabase
+        const { data: resultado, error } = await supabase
           .from('clientes')
           .update(dadosParaSalvar)
-          .eq('id', clienteId);
+          .eq('id', clienteId)
+          .select();
+
+        console.log('📤 Resultado da atualização:', { resultado, error });
 
         if (error) {
-          console.error('❌ Erro ao atualizar:', error); // DEBUG
+          console.error('❌ ERRO ao atualizar:', error);
           throw error;
         }
         
+        console.log('✅ Cliente atualizado com sucesso!');
         toast.success('Cliente atualizado com sucesso!');
       } else {
-        // ✅ CORREÇÃO: Adicionar o usuario_cadastro ao inserir novo cliente
+        console.log('➕ MODO INSERÇÃO - Cadastrando novo cliente...');
+        
         const dadosComUsuario = {
           ...dadosParaSalvar,
-          usuario_cadastro: usuarioLogado.id || null // Salva quem cadastrou (ou null se não tiver)
+          usuario_cadastro: usuarioLogado.id || null
         };
 
-        console.log('📝 Inserindo novo cliente com dados:', dadosComUsuario); // DEBUG
+        console.log('📦 Dados completos para inserção:', dadosComUsuario);
 
         const { data: resultado, error } = await supabase
           .from('clientes')
           .insert([dadosComUsuario])
-          .select(); // Retorna o registro inserido
+          .select();
+
+        console.log('📤 Resultado da inserção:', { resultado, error });
 
         if (error) {
-          console.error('❌ ERRO DETALHADO AO INSERIR:', {
+          console.error('❌ ERRO DETALHADO ao inserir:', {
             message: error.message,
             details: error.details,
             hint: error.hint,
-            code: error.code
+            code: error.code,
+            errorCompleto: error
           });
           throw error;
         }
 
-        console.log('✅ Cliente inserido com sucesso:', resultado); // DEBUG
+        if (resultado && resultado.length > 0) {
+          console.log('✅ Cliente inserido com sucesso! ID:', resultado[0].id);
+          console.log('📊 Dados do cliente inserido:', resultado[0]);
+        } else {
+          console.warn('⚠️ Insert retornou sucesso mas sem dados de retorno');
+        }
+        
         toast.success('Cliente cadastrado com sucesso!');
+
+        // Verificação adicional - tentar buscar o cliente recém-criado
+        console.log('🔍 Verificando se cliente foi realmente salvo...');
+        const { data: verificacao, error: erroVerificacao } = await supabase
+          .from('clientes')
+          .select('id, razao_social, created_at')
+          .eq('razao_social', dadosComUsuario.razao_social)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        console.log('🔍 Resultado da verificação:', { verificacao, erroVerificacao });
       }
 
-      navigate('/dashboard'); // Volta para o dashboard
+      console.log('🚀 Redirecionando para /dashboard...');
+      navigate('/dashboard');
     } catch (error) {
-      console.error('❌ Erro detalhado completo:', error);
+      console.error('❌ ERRO GERAL:', error);
+      console.error('❌ Stack trace:', error.stack);
       
-      // Mensagens de erro mais específicas
       if (error.code === '23505') {
         toast.error('Erro: Cliente com este CNPJ já existe!');
       } else if (error.code === '23502') {
@@ -279,6 +299,7 @@ export default function CadastroCliente() {
       }
     } finally {
       setCarregando(false);
+      console.log('🏁 Processo finalizado. Carregando:', carregando);
     }
   };
 
