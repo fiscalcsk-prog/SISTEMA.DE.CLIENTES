@@ -199,6 +199,8 @@ export default function CadastroCliente() {
       // ✅ CORREÇÃO: Pegar o ID do usuário logado
       const usuarioLogado = JSON.parse(localStorage.getItem('usuario') || '{}');
       
+      console.log('🔍 DEBUG - Usuário logado:', usuarioLogado); // DEBUG
+      
       // Garantir que todos os campos sejam strings
       const dadosParaSalvar = {
         razao_social: String(formData.razao_social || ''),
@@ -220,32 +222,61 @@ export default function CadastroCliente() {
       };
 
       if (modoEdicao) {
+        console.log('📝 Atualizando cliente:', clienteId); // DEBUG
+        
         const { error } = await supabase
           .from('clientes')
           .update(dadosParaSalvar)
           .eq('id', clienteId);
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Erro ao atualizar:', error); // DEBUG
+          throw error;
+        }
+        
         toast.success('Cliente atualizado com sucesso!');
       } else {
         // ✅ CORREÇÃO: Adicionar o usuario_cadastro ao inserir novo cliente
         const dadosComUsuario = {
           ...dadosParaSalvar,
-          usuario_cadastro: usuarioLogado.id // Salva quem cadastrou
+          usuario_cadastro: usuarioLogado.id || null // Salva quem cadastrou (ou null se não tiver)
         };
 
-        const { error } = await supabase
-          .from('clientes')
-          .insert([dadosComUsuario]);
+        console.log('📝 Inserindo novo cliente com dados:', dadosComUsuario); // DEBUG
 
-        if (error) throw error;
+        const { data: resultado, error } = await supabase
+          .from('clientes')
+          .insert([dadosComUsuario])
+          .select(); // Retorna o registro inserido
+
+        if (error) {
+          console.error('❌ ERRO DETALHADO AO INSERIR:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+          });
+          throw error;
+        }
+
+        console.log('✅ Cliente inserido com sucesso:', resultado); // DEBUG
         toast.success('Cliente cadastrado com sucesso!');
       }
 
-      navigate('/dashboard'); // ✅ MELHORIA: Volta para o dashboard ao invés de /clientes
+      navigate('/dashboard'); // Volta para o dashboard
     } catch (error) {
-      console.error('Erro detalhado:', error);
-      toast.error(error.message || 'Erro ao salvar cliente');
+      console.error('❌ Erro detalhado completo:', error);
+      
+      // Mensagens de erro mais específicas
+      if (error.code === '23505') {
+        toast.error('Erro: Cliente com este CNPJ já existe!');
+      } else if (error.code === '23502') {
+        toast.error('Erro: Campo obrigatório não preenchido!');
+      } else if (error.code === '23503') {
+        toast.error('Erro: Usuário de cadastro inválido!');
+      } else {
+        toast.error(error.message || 'Erro ao salvar cliente');
+      }
     } finally {
       setCarregando(false);
     }
@@ -253,48 +284,45 @@ export default function CadastroCliente() {
 
   return (
     <Layout>
-      <div className="animate-fade-in" data-testid="form-cadastro-cliente">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              {modoEdicao ? 'Editar Cliente' : 'Cadastrar Cliente'}
-            </h1>
-            <p className="text-gray-300 text-lg">Preencha as informações do cliente</p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => navigate('/clientes')}
-            className="bg-white/5 border-blue-500/30 text-white hover:bg-white/10"
-            data-testid="btn-voltar"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar
-          </Button>
-        </div>
-
+      <div className="container mx-auto px-4 py-8 animate-fade-in">
         <Card className="glass-effect border-blue-500/20">
           <CardHeader>
-            <CardTitle className="text-2xl text-white">Informações do Cliente</CardTitle>
+            <div className="flex items-center gap-3 mb-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate('/clientes')}
+                className="bg-white/5 border-blue-500/30 text-white hover:bg-white/10"
+                data-testid="btn-voltar"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <CardTitle className="text-3xl text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                {modoEdicao ? 'Editar Cliente' : 'Cadastro de Cliente'}
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Razão Social */}
-                <div className="space-y-2">
-                  <Label htmlFor="razao_social" className="text-gray-200">Razão Social *</Label>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="razao_social" className="text-gray-200">
+                    Razão Social <span className="text-red-400">*</span>
+                  </Label>
                   <Input
                     id="razao_social"
                     data-testid="input-razao-social"
+                    required
                     value={formData.razao_social}
                     onChange={(e) => setFormData({ ...formData, razao_social: e.target.value })}
-                    required
                     className="bg-white/5 border-blue-500/30 text-white placeholder:text-gray-400"
                   />
                 </div>
 
-                {/* Fantasia */}
+                {/* Nome Fantasia */}
                 <div className="space-y-2">
-                  <Label htmlFor="fantasia" className="text-gray-200">Fantasia</Label>
+                  <Label htmlFor="fantasia" className="text-gray-200">Nome Fantasia</Label>
                   <Input
                     id="fantasia"
                     data-testid="input-fantasia"
@@ -304,9 +332,9 @@ export default function CadastroCliente() {
                   />
                 </div>
 
-                {/* CNPJ */}
+                {/* CNPJ/CPF */}
                 <div className="space-y-2">
-                  <Label htmlFor="cnpj" className="text-gray-200">CNPJ / CPF</Label>
+                  <Label htmlFor="cnpj" className="text-gray-200">CNPJ/CPF</Label>
                   <Input
                     id="cnpj"
                     data-testid="input-cnpj"
@@ -347,10 +375,10 @@ export default function CadastroCliente() {
                     >
                       <SelectValue placeholder="Selecione a natureza jurídica" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
+                    <SelectContent>
                       {NATUREZAS_JURIDICAS.map((grupo) => (
                         <div key={grupo.grupo}>
-                          <div className="px-2 py-1.5 text-sm font-semibold text-gray-400">
+                          <div className="px-2 py-1.5 text-sm font-semibold text-gray-500">
                             {grupo.grupo}
                           </div>
                           {grupo.opcoes.map((opcao) => (
