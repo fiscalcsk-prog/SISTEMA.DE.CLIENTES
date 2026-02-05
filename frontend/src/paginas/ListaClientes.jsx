@@ -23,6 +23,31 @@ export default function ListaClientes() {
 
   useEffect(() => {
     carregarClientes();
+
+    // ✅ Atualização automática quando volta para a página
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        carregarClientes();
+      }
+    };
+
+    const handleFocus = () => {
+      carregarClientes();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    // ✅ Atualiza automaticamente a cada 30 segundos
+    const intervalo = setInterval(() => {
+      carregarClientes();
+    }, 30000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(intervalo);
+    };
   }, []);
 
   useEffect(() => {
