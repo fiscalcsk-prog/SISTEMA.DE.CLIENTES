@@ -196,6 +196,9 @@ export default function CadastroCliente() {
     setCarregando(true);
 
     try {
+      // ✅ CORREÇÃO: Pegar o ID do usuário logado
+      const usuarioLogado = JSON.parse(localStorage.getItem('usuario') || '{}');
+      
       // Garantir que todos os campos sejam strings
       const dadosParaSalvar = {
         razao_social: String(formData.razao_social || ''),
@@ -225,15 +228,21 @@ export default function CadastroCliente() {
         if (error) throw error;
         toast.success('Cliente atualizado com sucesso!');
       } else {
+        // ✅ CORREÇÃO: Adicionar o usuario_cadastro ao inserir novo cliente
+        const dadosComUsuario = {
+          ...dadosParaSalvar,
+          usuario_cadastro: usuarioLogado.id // Salva quem cadastrou
+        };
+
         const { error } = await supabase
           .from('clientes')
-          .insert([dadosParaSalvar]);
+          .insert([dadosComUsuario]);
 
         if (error) throw error;
         toast.success('Cliente cadastrado com sucesso!');
       }
 
-      navigate('/clientes');
+      navigate('/dashboard'); // ✅ MELHORIA: Volta para o dashboard ao invés de /clientes
     } catch (error) {
       console.error('Erro detalhado:', error);
       toast.error(error.message || 'Erro ao salvar cliente');
