@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { UserPlus, Trash2, Edit, Search, RefreshCw } from 'lucide-react';
+import { UserPlus, Trash2, Edit, Search, RefreshCw, AlertCircle } from 'lucide-react';
 import Layout from '@/componentes/Layout';
 
 export default function GerenciarUsuarios() {
@@ -21,6 +21,7 @@ export default function GerenciarUsuarios() {
   const [carregando, setCarregando] = useState(false);
   const [carregandoLista, setCarregandoLista] = useState(true);
   const [busca, setBusca] = useState('');
+  const [erroAPI, setErroAPI] = useState(null);
 
   const [formData, setFormData] = useState({
     nome: '',
@@ -39,24 +40,77 @@ export default function GerenciarUsuarios() {
   // ========== FUNÇÃO PARA BUSCAR USUÁRIOS ==========
   const buscarUsuarios = async () => {
     setCarregandoLista(true);
+    setErroAPI(null);
+    
     try {
+      console.log('🔍 Buscando usuários em: /api/usuarios');
+      
       const response = await fetch('/api/usuarios', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       });
 
-      const data = await response.json();
+      console.log('📡 Status da resposta:', response.status);
+      console.log('📡 Headers:', response.headers);
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Erro ao buscar usuários');
+      // Verificar se a resposta é JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const textoResposta = await response.text();
+        console.error('❌ Resposta não é JSON:', textoResposta.substring(0, 200));
+        
+        setErroAPI({
+          tipo: 'NAO_JSON',
+          mensagem: 'A API retornou HTML ao invés de JSON. A rota /api/usuarios provavelmente não existe no backend.',
+          detalhes: `Status: ${response.status}, Content-Type: ${contentType}`
+        });
+        
+        setUsuarios([]);
+        setUsuariosFiltrados([]);
+        return;
       }
 
-      setUsuarios(data.usuarios || []);
-      setUsuariosFiltrados(data.usuarios || []);
+      const data = await response.json();
+      console.log('✅ Dados recebidos:', data);
+
+      if (!response.ok) {
+        throw new Error(data.error || `Erro HTTP ${response.status}`);
+      }
+
+      // Verificar estrutura da resposta
+      if (data.usuarios && Array.isArray(data.usuarios)) {
+        setUsuarios(data.usuarios);
+        setUsuariosFiltrados(data.usuarios);
+        setErroAPI(null);
+        console.log(`✅ ${data.usuarios.length} usuário(s) carregado(s)`);
+      } else {
+        console.warn('⚠️ Estrutura inesperada:', data);
+        setErroAPI({
+          tipo: 'ESTRUTURA_INVALIDA',
+          mensagem: 'A API retornou dados em formato inesperado',
+          detalhes: 'Esperado: { success: true, usuarios: [...] }'
+        });
+        setUsuarios([]);
+        setUsuariosFiltrados([]);
+      }
       
     } catch (error) {
-      console.error('Erro ao buscar usuários:', error);
-      toast.error('Erro ao carregar lista de usuários');
+      console.error('❌ Erro ao buscar usuários:', error);
+      
+      if (error.name === 'SyntaxError') {
+        setErroAPI({
+          tipo: 'ERRO_JSON',
+          mensagem: 'A rota /api/usuarios não existe no backend',
+          detalhes: 'Verifique se você criou e registrou a rota no servidor'
+        });
+      } else {
+        setErroAPI({
+          tipo: 'ERRO_REDE',
+          mensagem: error.message,
+          detalhes: 'Verifique se o servidor backend está rodando'
+        });
+      }
+      
       setUsuarios([]);
       setUsuariosFiltrados([]);
     } finally {
@@ -76,11 +130,11 @@ export default function GerenciarUsuarios() {
     } else {
       const termo = busca.toLowerCase();
       const filtrados = usuarios.filter(u => 
-        u.nome.toLowerCase().includes(termo) ||
+        u.nome?.toLowerCase().includes(termo) ||
         u.usuario?.toLowerCase().includes(termo) ||
         u.username?.toLowerCase().includes(termo) ||
-        u.email.toLowerCase().includes(termo) ||
-        u.tipo.toLowerCase().includes(termo)
+        u.email?.toLowerCase().includes(termo) ||
+        u.tipo?.toLowerCase().includes(termo)
       );
       setUsuariosFiltrados(filtrados);
     }
@@ -114,7 +168,7 @@ export default function GerenciarUsuarios() {
       nome: usuario.nome,
       usuario: usuario.username || usuario.usuario,
       email: usuario.email,
-      senha: '', // Não preencher senha na edição
+      senha: '',
       tipo: usuario.tipo,
       permissoes: usuario.permissoes || {
         consultar: true,
@@ -146,10 +200,11 @@ export default function GerenciarUsuarios() {
         permissoes: formData.permissoes
       };
 
-      // Só enviar senha se foi preenchida
       if (formData.senha.trim() !== '') {
         body.senha = formData.senha;
       }
+
+      console.log(`📤 ${method} ${url}:`, body);
 
       const response = await fetch(url, {
         method: method,
@@ -167,10 +222,10 @@ export default function GerenciarUsuarios() {
       setDialogAberto(false);
       limparFormulario();
       
-      // ATUALIZAR LISTA DE USUÁRIOS
       await buscarUsuarios();
       
     } catch (error) {
+      console.error('❌ Erro ao salvar:', error);
       toast.error(error.message);
     } finally {
       setCarregando(false);
@@ -180,6 +235,8 @@ export default function GerenciarUsuarios() {
   // ========== EXCLUIR USUÁRIO ==========
   const handleExcluir = async (id) => {
     try {
+      console.log(`🗑️ Excluindo usuário ID: ${id}`);
+      
       const response = await fetch(`/api/usuarios/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' }
@@ -192,11 +249,10 @@ export default function GerenciarUsuarios() {
       }
 
       toast.success('Usuário excluído com sucesso!');
-      
-      // ATUALIZAR LISTA
       await buscarUsuarios();
       
     } catch (error) {
+      console.error('❌ Erro ao excluir:', error);
       toast.error(error.message);
     }
   };
@@ -376,20 +432,52 @@ export default function GerenciarUsuarios() {
           </div>
         </div>
 
+        {/* CARD DE ERRO DA API */}
+        {erroAPI && (
+          <Card className="glass-effect border-red-500/40 bg-red-500/10 mb-6">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <AlertCircle className="h-6 w-6 text-red-400 flex-shrink-0 mt-1" />
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-red-300 mb-2">
+                    ⚠️ Erro ao conectar com a API
+                  </h3>
+                  <p className="text-red-200 mb-3">{erroAPI.mensagem}</p>
+                  <div className="bg-black/30 p-3 rounded-lg">
+                    <p className="text-xs text-red-300 font-mono">{erroAPI.detalhes}</p>
+                  </div>
+                  
+                  <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <p className="text-sm text-blue-200 font-semibold mb-2">🔧 Como resolver:</p>
+                    <ol className="text-sm text-blue-100 space-y-2 ml-4 list-decimal">
+                      <li>Certifique-se que o servidor backend está rodando</li>
+                      <li>Verifique se criou o arquivo <code className="bg-black/30 px-1 rounded">listar-usuarios.js</code></li>
+                      <li>Verifique se registrou as rotas no <code className="bg-black/30 px-1 rounded">server.js</code></li>
+                      <li>Abra o Console (F12) para mais detalhes</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="glass-effect border-blue-500/20">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-2xl text-white">Usuários</CardTitle>
               
-              <div className="relative w-72">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Buscar usuário..."
-                  value={busca}
-                  onChange={(e) => setBusca(e.target.value)}
-                  className="pl-10 bg-white/5 border-blue-500/30 text-white"
-                />
-              </div>
+              {!erroAPI && (
+                <div className="relative w-72">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Buscar usuário..."
+                    value={busca}
+                    onChange={(e) => setBusca(e.target.value)}
+                    className="pl-10 bg-white/5 border-blue-500/30 text-white"
+                  />
+                </div>
+              )}
             </div>
           </CardHeader>
           
@@ -398,6 +486,20 @@ export default function GerenciarUsuarios() {
               <div className="text-center py-12">
                 <RefreshCw className="h-8 w-8 animate-spin text-purple-500 mx-auto mb-4" />
                 <p className="text-gray-400">Carregando usuários...</p>
+              </div>
+            ) : erroAPI ? (
+              <div className="text-center py-12">
+                <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                <p className="text-gray-400 text-lg mb-4">
+                  Não foi possível carregar os usuários
+                </p>
+                <Button
+                  onClick={buscarUsuarios}
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Tentar novamente
+                </Button>
               </div>
             ) : usuariosFiltrados.length === 0 ? (
               <div className="text-center py-12">
