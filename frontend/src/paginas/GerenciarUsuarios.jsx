@@ -65,45 +65,96 @@ export default function GerenciarUsuarios() {
   );
 
   // Função para obter cor do badge baseado no tipo
-  const getBadgeVariant = (tipo) => {
+  const getBadgeStyle = (tipo) => {
     switch(tipo) {
       case 'ADM':
-        return 'default';
+        return {
+          bg: 'bg-blue-500/20',
+          border: 'border-blue-500/50',
+          text: 'text-blue-300'
+        };
+      case 'FISCAL':
+        return {
+          bg: 'bg-purple-500/20',
+          border: 'border-purple-500/50',
+          text: 'text-purple-300'
+        };
       case 'USUARIO':
-        return 'secondary';
+        return {
+          bg: 'bg-green-500/20',
+          border: 'border-green-500/50',
+          text: 'text-green-300'
+        };
       default:
-        return 'outline';
+        return {
+          bg: 'bg-slate-500/20',
+          border: 'border-slate-500/50',
+          text: 'text-slate-300'
+        };
     }
   };
 
-  // Função para renderizar ícones de permissões
+  // Função para renderizar ícones de permissões com cores diferentes
   const renderPermissoes = (permissoes) => {
     if (!permissoes) return null;
     
     const permissoesLista = [
-      { key: 'consultar', label: 'Consultar', icon: Eye },
-      { key: 'cadastrar', label: 'Cadastrar', icon: UserPlus },
-      { key: 'editar', label: 'Editar', icon: Edit },
-      { key: 'excluir', label: 'Excluir', icon: Trash2 }
+      { 
+        key: 'consultar', 
+        label: 'Consultar', 
+        icon: Eye,
+        colors: {
+          active: { bg: 'bg-blue-500/20', text: 'text-blue-300', border: 'border-blue-500/40' },
+          inactive: { bg: 'bg-blue-500/5', text: 'text-blue-400/30', border: 'border-blue-500/10' }
+        }
+      },
+      { 
+        key: 'cadastrar', 
+        label: 'Cadastrar', 
+        icon: UserPlus,
+        colors: {
+          active: { bg: 'bg-green-500/20', text: 'text-green-300', border: 'border-green-500/40' },
+          inactive: { bg: 'bg-green-500/5', text: 'text-green-400/30', border: 'border-green-500/10' }
+        }
+      },
+      { 
+        key: 'editar', 
+        label: 'Editar', 
+        icon: Edit,
+        colors: {
+          active: { bg: 'bg-amber-500/20', text: 'text-amber-300', border: 'border-amber-500/40' },
+          inactive: { bg: 'bg-amber-500/5', text: 'text-amber-400/30', border: 'border-amber-500/10' }
+        }
+      },
+      { 
+        key: 'excluir', 
+        label: 'Excluir', 
+        icon: Trash2,
+        colors: {
+          active: { bg: 'bg-red-500/20', text: 'text-red-300', border: 'border-red-500/40' },
+          inactive: { bg: 'bg-red-500/5', text: 'text-red-400/30', border: 'border-red-500/10' }
+        }
+      }
     ];
 
     return (
-      <div className="flex flex-wrap gap-2 mt-3">
-        {permissoesLista.map(({ key, label, icon: Icon }) => (
-          <div
-            key={key}
-            className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs ${
-              permissoes[key]
-                ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                : 'bg-red-500/10 text-red-400/50 border border-red-500/20'
-            }`}
-            title={`${label}: ${permissoes[key] ? 'Ativado' : 'Desativado'}`}
-          >
-            <Icon size={12} />
-            <span>{label}</span>
-            {permissoes[key] ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
-          </div>
-        ))}
+      <div className="flex flex-wrap gap-1.5 mt-2">
+        {permissoesLista.map(({ key, label, icon: Icon, colors }) => {
+          const isActive = permissoes[key];
+          const colorSet = isActive ? colors.active : colors.inactive;
+          
+          return (
+            <div
+              key={key}
+              className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs border ${colorSet.bg} ${colorSet.text} ${colorSet.border}`}
+              title={`${label}: ${isActive ? 'Ativado' : 'Desativado'}`}
+            >
+              <Icon size={11} />
+              <span className="text-[10px] font-medium">{label}</span>
+              {isActive ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -235,108 +286,104 @@ export default function GerenciarUsuarios() {
           </div>
         )}
 
-        {/* Grid de Cards */}
+        {/* Grid de Cards - Cards menores e mais compridos */}
         {!carregando && !erro && usuariosFiltrados.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {usuariosFiltrados.map((usuario) => (
-              <Card
-                key={usuario.id}
-                className="border-blue-500/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20 group"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%)',
-                  backdropFilter: 'blur(15px)'
-                }}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between mb-2">
-                    <div 
-                      className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-300 group-hover:scale-110"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.2) 100%)',
-                        border: '2px solid rgba(59, 130, 246, 0.4)',
-                        color: '#60a5fa'
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {usuariosFiltrados.map((usuario) => {
+              const badgeStyle = getBadgeStyle(usuario.tipo);
+              
+              return (
+                <Card
+                  key={usuario.id}
+                  className="border-blue-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/10 group"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%)',
+                    backdropFilter: 'blur(15px)'
+                  }}
+                >
+                  <CardHeader className="pb-2 pt-4 px-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div 
+                        className="w-12 h-12 rounded-lg flex items-center justify-center text-lg font-bold transition-all duration-300 group-hover:scale-110"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.2) 100%)',
+                          border: '2px solid rgba(59, 130, 246, 0.4)',
+                          color: '#60a5fa'
+                        }}
+                      >
+                        {usuario.nome?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                      
+                      <div 
+                        className={`px-2 py-1 rounded-md text-[10px] font-semibold border ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}
+                      >
+                        {usuario.tipo || 'N/A'}
+                      </div>
+                    </div>
+
+                    <CardTitle className="text-base text-white font-bold leading-tight">
+                      {usuario.nome || 'Nome não disponível'}
+                    </CardTitle>
+                    
+                    <CardDescription className="text-slate-400 flex items-center gap-1.5 mt-1 text-xs">
+                      <User size={12} />
+                      @{usuario.username || 'username'}
+                    </CardDescription>
+                  </CardHeader>
+
+                  <CardContent className="px-4 pb-3">
+                    {/* Permissões */}
+                    <div>
+                      <p className="text-[10px] text-slate-400 mb-1 font-semibold uppercase tracking-wide">Permissões:</p>
+                      {renderPermissoes(usuario.permissoes)}
+                    </div>
+                  </CardContent>
+
+                  <CardFooter className="gap-1.5 pt-3 px-4 pb-4 border-t border-blue-500/10">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20 h-8 text-xs"
+                      onClick={() => {
+                        // Implementar visualização
+                        console.log('Visualizar:', usuario.id);
                       }}
                     >
-                      {usuario.nome?.charAt(0).toUpperCase() || 'U'}
-                    </div>
+                      <Eye className="mr-1 h-3 w-3" />
+                      Ver
+                    </Button>
                     
-                    <Badge 
-                      variant={getBadgeVariant(usuario.tipo)}
-                      className="text-xs"
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 h-8 text-xs"
+                      onClick={() => {
+                        // Implementar edição
+                        console.log('Editar:', usuario.id);
+                      }}
                     >
-                      {usuario.tipo || 'N/A'}
-                    </Badge>
-                  </div>
-
-                  <CardTitle className="text-xl text-white font-bold">
-                    {usuario.nome || 'Nome não disponível'}
-                  </CardTitle>
-                  
-                  <CardDescription className="text-slate-400 flex items-center gap-2 mt-2">
-                    <User size={14} />
-                    @{usuario.username || 'username'}
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent className="space-y-3">
-                  {/* ID */}
-                  <div className="flex items-center gap-2 text-sm">
-                    <Shield className="text-blue-400" size={16} />
-                    <span className="text-slate-400">ID:</span>
-                    <span className="text-slate-300 font-mono text-xs">{usuario.id}</span>
-                  </div>
-
-                  {/* Permissões */}
-                  <div>
-                    <p className="text-xs text-slate-400 mb-2 font-semibold">PERMISSÕES:</p>
-                    {renderPermissoes(usuario.permissoes)}
-                  </div>
-                </CardContent>
-
-                <CardFooter className="gap-2 pt-4 border-t border-blue-500/10">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
-                    onClick={() => {
-                      // Implementar visualização
-                      console.log('Visualizar:', usuario.id);
-                    }}
-                  >
-                    <Eye className="mr-1 h-3 w-3" />
-                    Ver
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20"
-                    onClick={() => {
-                      // Implementar edição
-                      console.log('Editar:', usuario.id);
-                    }}
-                  >
-                    <Edit className="mr-1 h-3 w-3" />
-                    Editar
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20"
-                    onClick={() => {
-                      // Implementar exclusão
-                      if (window.confirm(`Deseja realmente excluir ${usuario.nome}?`)) {
-                        console.log('Excluir:', usuario.id);
-                      }
-                    }}
-                  >
-                    <Trash2 className="mr-1 h-3 w-3" />
-                    Excluir
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+                      <Edit className="mr-1 h-3 w-3" />
+                      Editar
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20 h-8 text-xs"
+                      onClick={() => {
+                        // Implementar exclusão
+                        if (window.confirm(`Deseja realmente excluir ${usuario.nome}?`)) {
+                          console.log('Excluir:', usuario.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="mr-1 h-3 w-3" />
+                      Excluir
+                    </Button>
+                  </CardFooter>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
