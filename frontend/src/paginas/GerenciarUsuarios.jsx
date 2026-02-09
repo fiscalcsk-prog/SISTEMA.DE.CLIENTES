@@ -4,6 +4,11 @@ import Layout from '../componentes/Layout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   UserPlus, 
   Search, 
@@ -17,7 +22,9 @@ import {
   Edit,
   Trash2,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Save,
+  X as CloseIcon
 } from 'lucide-react';
 
 export default function GerenciarUsuarios() {
@@ -26,6 +33,22 @@ export default function GerenciarUsuarios() {
   const [erro, setErro] = useState(null);
   const [busca, setBusca] = useState('');
   const navigate = useNavigate();
+
+  // Estados do modal de edição
+  const [modalAberto, setModalAberto] = useState(false);
+  const [usuarioEditando, setUsuarioEditando] = useState(null);
+  const [salvando, setSalvando] = useState(false);
+  const [formData, setFormData] = useState({
+    nome: '',
+    username: '',
+    tipo: '',
+    permissoes: {
+      consultar: false,
+      cadastrar: false,
+      editar: false,
+      excluir: false
+    }
+  });
 
   const carregarUsuarios = async () => {
     setCarregando(true);
@@ -50,6 +73,91 @@ export default function GerenciarUsuarios() {
       setErro(error.message);
     } finally {
       setCarregando(false);
+    }
+  };
+
+  // Abrir modal de edição
+  const abrirModalEdicao = (usuario) => {
+    setUsuarioEditando(usuario);
+    setFormData({
+      nome: usuario.nome || '',
+      username: usuario.username || '',
+      tipo: usuario.tipo || 'USUARIO',
+      permissoes: {
+        consultar: usuario.permissoes?.consultar || false,
+        cadastrar: usuario.permissoes?.cadastrar || false,
+        editar: usuario.permissoes?.editar || false,
+        excluir: usuario.permissoes?.excluir || false
+      }
+    });
+    setModalAberto(true);
+  };
+
+  // Fechar modal
+  const fecharModal = () => {
+    setModalAberto(false);
+    setUsuarioEditando(null);
+    setSalvando(false);
+  };
+
+  // Salvar edição
+  const salvarEdicao = async () => {
+    setSalvando(true);
+    
+    try {
+      const response = await fetch(`/api/atualizar-usuario`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: usuarioEditando.id,
+          ...formData
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar usuário');
+      }
+
+      // Recarregar lista
+      await carregarUsuarios();
+      fecharModal();
+      
+      alert('Usuário atualizado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar:', error);
+      alert('Erro ao atualizar usuário. Tente novamente.');
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  // Excluir usuário
+  const excluirUsuario = async (usuario) => {
+    if (!window.confirm(`Deseja realmente excluir ${usuario.nome}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/excluir-usuario`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: usuario.id })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao excluir usuário');
+      }
+
+      // Recarregar lista
+      await carregarUsuarios();
+      alert('Usuário excluído com sucesso!');
+    } catch (error) {
+      console.error('Erro ao excluir:', error);
+      alert('Erro ao excluir usuário. Tente novamente.');
     }
   };
 
@@ -343,24 +451,8 @@ export default function GerenciarUsuarios() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20 h-8 text-xs"
-                      onClick={() => {
-                        // Implementar visualização
-                        console.log('Visualizar:', usuario.id);
-                      }}
-                    >
-                      <Eye className="mr-1 h-3 w-3" />
-                      Ver
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
                       className="flex-1 bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 h-8 text-xs"
-                      onClick={() => {
-                        // Implementar edição
-                        console.log('Editar:', usuario.id);
-                      }}
+                      onClick={() => abrirModalEdicao(usuario)}
                     >
                       <Edit className="mr-1 h-3 w-3" />
                       Editar
@@ -370,12 +462,7 @@ export default function GerenciarUsuarios() {
                       variant="outline"
                       size="sm"
                       className="flex-1 bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20 h-8 text-xs"
-                      onClick={() => {
-                        // Implementar exclusão
-                        if (window.confirm(`Deseja realmente excluir ${usuario.nome}?`)) {
-                          console.log('Excluir:', usuario.id);
-                        }
-                      }}
+                      onClick={() => excluirUsuario(usuario)}
                     >
                       <Trash2 className="mr-1 h-3 w-3" />
                       Excluir
@@ -387,6 +474,194 @@ export default function GerenciarUsuarios() {
           </div>
         )}
       </div>
+
+      {/* Modal de Edição */}
+      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+        <DialogContent 
+          className="sm:max-w-[500px] border-blue-500/20"
+          style={{
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%)',
+            backdropFilter: 'blur(20px)'
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle 
+              className="text-2xl"
+              style={{
+                background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
+            >
+              Editar Usuário
+            </DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Atualize as informações do usuário abaixo
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Nome */}
+            <div className="space-y-2">
+              <Label htmlFor="nome" className="text-slate-300">Nome Completo</Label>
+              <Input
+                id="nome"
+                value={formData.nome}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                className="bg-slate-800/50 border-blue-500/20 text-white focus:border-blue-500/50"
+                placeholder="Digite o nome completo"
+              />
+            </div>
+
+            {/* Username */}
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-slate-300">Username</Label>
+              <Input
+                id="username"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                className="bg-slate-800/50 border-blue-500/20 text-white focus:border-blue-500/50"
+                placeholder="Digite o username"
+              />
+            </div>
+
+            {/* Tipo */}
+            <div className="space-y-2">
+              <Label htmlFor="tipo" className="text-slate-300">Tipo de Usuário</Label>
+              <Select 
+                value={formData.tipo} 
+                onValueChange={(value) => setFormData({ ...formData, tipo: value })}
+              >
+                <SelectTrigger className="bg-slate-800/50 border-blue-500/20 text-white">
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-blue-500/20">
+                  <SelectItem value="ADM">Administrador</SelectItem>
+                  <SelectItem value="FISCAL">Fiscal</SelectItem>
+                  <SelectItem value="USUARIO">Usuário</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Permissões */}
+            <div className="space-y-3">
+              <Label className="text-slate-300">Permissões</Label>
+              
+              <div className="space-y-3 p-4 rounded-lg border border-blue-500/20 bg-slate-800/30">
+                {/* Consultar */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Eye className="text-blue-400" size={16} />
+                    <Label htmlFor="perm-consultar" className="text-slate-300 cursor-pointer">
+                      Consultar
+                    </Label>
+                  </div>
+                  <Switch
+                    id="perm-consultar"
+                    checked={formData.permissoes.consultar}
+                    onCheckedChange={(checked) => 
+                      setFormData({ 
+                        ...formData, 
+                        permissoes: { ...formData.permissoes, consultar: checked }
+                      })
+                    }
+                  />
+                </div>
+
+                {/* Cadastrar */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <UserPlus className="text-green-400" size={16} />
+                    <Label htmlFor="perm-cadastrar" className="text-slate-300 cursor-pointer">
+                      Cadastrar
+                    </Label>
+                  </div>
+                  <Switch
+                    id="perm-cadastrar"
+                    checked={formData.permissoes.cadastrar}
+                    onCheckedChange={(checked) => 
+                      setFormData({ 
+                        ...formData, 
+                        permissoes: { ...formData.permissoes, cadastrar: checked }
+                      })
+                    }
+                  />
+                </div>
+
+                {/* Editar */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Edit className="text-amber-400" size={16} />
+                    <Label htmlFor="perm-editar" className="text-slate-300 cursor-pointer">
+                      Editar
+                    </Label>
+                  </div>
+                  <Switch
+                    id="perm-editar"
+                    checked={formData.permissoes.editar}
+                    onCheckedChange={(checked) => 
+                      setFormData({ 
+                        ...formData, 
+                        permissoes: { ...formData.permissoes, editar: checked }
+                      })
+                    }
+                  />
+                </div>
+
+                {/* Excluir */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Trash2 className="text-red-400" size={16} />
+                    <Label htmlFor="perm-excluir" className="text-slate-300 cursor-pointer">
+                      Excluir
+                    </Label>
+                  </div>
+                  <Switch
+                    id="perm-excluir"
+                    checked={formData.permissoes.excluir}
+                    onCheckedChange={(checked) => 
+                      setFormData({ 
+                        ...formData, 
+                        permissoes: { ...formData.permissoes, excluir: checked }
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={fecharModal}
+              disabled={salvando}
+              className="bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-700"
+            >
+              <CloseIcon className="mr-2 h-4 w-4" />
+              Cancelar
+            </Button>
+            <Button
+              onClick={salvarEdicao}
+              disabled={salvando}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+            >
+              {salvando ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Salvar Alterações
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
