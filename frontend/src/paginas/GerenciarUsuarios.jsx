@@ -1,622 +1,344 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Layout from '../components/Layout';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
-import { UserPlus, Trash2, Edit, Search, RefreshCw, AlertCircle } from 'lucide-react';
-import Layout from '@/componentes/Layout';
+import { 
+  UserPlus, 
+  Search, 
+  AlertCircle, 
+  RefreshCw, 
+  User, 
+  Mail, 
+  Shield,
+  Eye,
+  FileText,
+  Edit,
+  Trash2,
+  CheckCircle2,
+  XCircle
+} from 'lucide-react';
 
 export default function GerenciarUsuarios() {
   const [usuarios, setUsuarios] = useState([]);
-  const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
-  const [dialogAberto, setDialogAberto] = useState(false);
-  const [usuarioEditando, setUsuarioEditando] = useState(null);
-  const [carregando, setCarregando] = useState(false);
-  const [carregandoLista, setCarregandoLista] = useState(true);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(null);
   const [busca, setBusca] = useState('');
-  const [erroAPI, setErroAPI] = useState(null);
+  const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    nome: '',
-    usuario: '',
-    email: '',
-    senha: '',
-    tipo: 'FISCAL',
-    permissoes: {
-      consultar: true,
-      cadastrar: false,
-      editar: false,
-      excluir: false
-    }
-  });
-
-  // ========== FUNÇÃO PARA BUSCAR USUÁRIOS ==========
-  const buscarUsuarios = async () => {
-    setCarregandoLista(true);
-    setErroAPI(null);
+  const carregarUsuarios = async () => {
+    setCarregando(true);
+    setErro(null);
     
     try {
-      console.log('🔍 Buscando usuários em: /api/usuarios');
+      const response = await fetch('/api/usuarios');
       
-      const response = await fetch('/api/usuarios', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      console.log('📡 Status da resposta:', response.status);
-      console.log('📡 Headers:', response.headers);
-
-      // Verificar se a resposta é JSON
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        const textoResposta = await response.text();
-        console.error('❌ Resposta não é JSON:', textoResposta.substring(0, 200));
-        
-        setErroAPI({
-          tipo: 'NAO_JSON',
-          mensagem: 'A API retornou HTML ao invés de JSON. A rota /api/usuarios provavelmente não existe no backend.',
-          detalhes: `Status: ${response.status}, Content-Type: ${contentType}`
-        });
-        
-        setUsuarios([]);
-        setUsuariosFiltrados([]);
-        return;
+      if (!response.ok) {
+        throw new Error(`Erro HTTP: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('✅ Dados recebidos:', data);
-
-      if (!response.ok) {
-        throw new Error(data.error || `Erro HTTP ${response.status}`);
-      }
-
-      // Verificar estrutura da resposta
-      if (data.usuarios && Array.isArray(data.usuarios)) {
+      
+      if (data.usuarios) {
         setUsuarios(data.usuarios);
-        setUsuariosFiltrados(data.usuarios);
-        setErroAPI(null);
-        console.log(`✅ ${data.usuarios.length} usuário(s) carregado(s)`);
       } else {
-        console.warn('⚠️ Estrutura inesperada:', data);
-        setErroAPI({
-          tipo: 'ESTRUTURA_INVALIDA',
-          mensagem: 'A API retornou dados em formato inesperado',
-          detalhes: 'Esperado: { success: true, usuarios: [...] }'
-        });
-        setUsuarios([]);
-        setUsuariosFiltrados([]);
+        throw new Error('Formato de resposta inválido');
       }
-      
     } catch (error) {
-      console.error('❌ Erro ao buscar usuários:', error);
-      
-      if (error.name === 'SyntaxError') {
-        setErroAPI({
-          tipo: 'ERRO_JSON',
-          mensagem: 'A rota /api/usuarios não existe no backend',
-          detalhes: 'Verifique se você criou e registrou a rota no servidor'
-        });
-      } else {
-        setErroAPI({
-          tipo: 'ERRO_REDE',
-          mensagem: error.message,
-          detalhes: 'Verifique se o servidor backend está rodando'
-        });
-      }
-      
-      setUsuarios([]);
-      setUsuariosFiltrados([]);
-    } finally {
-      setCarregandoLista(false);
-    }
-  };
-
-  // ========== CARREGAR USUÁRIOS AO MONTAR COMPONENTE ==========
-  useEffect(() => {
-    buscarUsuarios();
-  }, []);
-
-  // ========== FILTRAR USUÁRIOS PELA BUSCA ==========
-  useEffect(() => {
-    if (busca.trim() === '') {
-      setUsuariosFiltrados(usuarios);
-    } else {
-      const termo = busca.toLowerCase();
-      const filtrados = usuarios.filter(u => 
-        u.nome?.toLowerCase().includes(termo) ||
-        u.usuario?.toLowerCase().includes(termo) ||
-        u.username?.toLowerCase().includes(termo) ||
-        u.email?.toLowerCase().includes(termo) ||
-        u.tipo?.toLowerCase().includes(termo)
-      );
-      setUsuariosFiltrados(filtrados);
-    }
-  }, [busca, usuarios]);
-
-  const limparFormulario = () => {
-    setFormData({
-      nome: '',
-      usuario: '',
-      email: '',
-      senha: '',
-      tipo: 'FISCAL',
-      permissoes: {
-        consultar: true,
-        cadastrar: false,
-        editar: false,
-        excluir: false
-      }
-    });
-    setUsuarioEditando(null);
-  };
-
-  const abrirDialogNovo = () => {
-    limparFormulario();
-    setDialogAberto(true);
-  };
-
-  const abrirDialogEditar = (usuario) => {
-    setUsuarioEditando(usuario);
-    setFormData({
-      nome: usuario.nome,
-      usuario: usuario.username || usuario.usuario,
-      email: usuario.email,
-      senha: '',
-      tipo: usuario.tipo,
-      permissoes: usuario.permissoes || {
-        consultar: true,
-        cadastrar: false,
-        editar: false,
-        excluir: false
-      }
-    });
-    setDialogAberto(true);
-  };
-
-  // ========== CRIAR OU EDITAR USUÁRIO ==========
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setCarregando(true);
-
-    try {
-      const url = usuarioEditando 
-        ? `/api/usuarios/${usuarioEditando.id}`
-        : '/api/criar-usuario';
-      
-      const method = usuarioEditando ? 'PUT' : 'POST';
-
-      const body = {
-        nome: formData.nome,
-        username: formData.usuario,
-        email: formData.email,
-        tipo: formData.tipo,
-        permissoes: formData.permissoes
-      };
-
-      if (formData.senha.trim() !== '') {
-        body.senha = formData.senha;
-      }
-
-      console.log(`📤 ${method} ${url}:`, body);
-
-      const response = await fetch(url, {
-        method: method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erro ao salvar usuário');
-      }
-
-      toast.success(usuarioEditando ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!');
-      setDialogAberto(false);
-      limparFormulario();
-      
-      await buscarUsuarios();
-      
-    } catch (error) {
-      console.error('❌ Erro ao salvar:', error);
-      toast.error(error.message);
+      console.error('Erro ao carregar usuários:', error);
+      setErro(error.message);
     } finally {
       setCarregando(false);
     }
   };
 
-  // ========== EXCLUIR USUÁRIO ==========
-  const handleExcluir = async (id) => {
-    try {
-      console.log(`🗑️ Excluindo usuário ID: ${id}`);
-      
-      const response = await fetch(`/api/usuarios/${id}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
+  useEffect(() => {
+    carregarUsuarios();
+  }, []);
 
-      const data = await response.json();
+  // Filtrar usuários pela busca
+  const usuariosFiltrados = usuarios.filter(usuario => 
+    usuario.nome?.toLowerCase().includes(busca.toLowerCase()) ||
+    usuario.username?.toLowerCase().includes(busca.toLowerCase()) ||
+    usuario.tipo?.toLowerCase().includes(busca.toLowerCase())
+  );
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Erro ao excluir usuário');
-      }
-
-      toast.success('Usuário excluído com sucesso!');
-      await buscarUsuarios();
-      
-    } catch (error) {
-      console.error('❌ Erro ao excluir:', error);
-      toast.error(error.message);
+  // Função para obter cor do badge baseado no tipo
+  const getBadgeVariant = (tipo) => {
+    switch(tipo) {
+      case 'ADM':
+        return 'default';
+      case 'USUARIO':
+        return 'secondary';
+      default:
+        return 'outline';
     }
   };
 
-  const getTipoBadge = (tipo) => {
-    const cores = {
-      ADM: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-      FISCAL: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-      CONTABIL: 'bg-green-500/20 text-green-300 border-green-500/30',
-      RH: 'bg-orange-500/20 text-orange-300 border-orange-500/30'
-    };
-    return cores[tipo] || 'bg-gray-500/20 text-gray-300 border-gray-500/30';
-  };
+  // Função para renderizar ícones de permissões
+  const renderPermissoes = (permissoes) => {
+    if (!permissoes) return null;
+    
+    const permissoesLista = [
+      { key: 'consultar', label: 'Consultar', icon: Eye },
+      { key: 'cadastrar', label: 'Cadastrar', icon: UserPlus },
+      { key: 'editar', label: 'Editar', icon: Edit },
+      { key: 'excluir', label: 'Excluir', icon: Trash2 }
+    ];
 
-  const getTipoTexto = (tipo) => {
-    const textos = {
-      ADM: 'Administrador',
-      FISCAL: 'Fiscal',
-      CONTABIL: 'Contábil',
-      RH: 'RH'
-    };
-    return textos[tipo] || tipo;
+    return (
+      <div className="flex flex-wrap gap-2 mt-3">
+        {permissoesLista.map(({ key, label, icon: Icon }) => (
+          <div
+            key={key}
+            className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs ${
+              permissoes[key]
+                ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                : 'bg-red-500/10 text-red-400/50 border border-red-500/20'
+            }`}
+            title={`${label}: ${permissoes[key] ? 'Ativado' : 'Desativado'}`}
+          >
+            <Icon size={12} />
+            <span>{label}</span>
+            {permissoes[key] ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
     <Layout>
-      <div className="animate-fade-in">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Gerenciar Usuários</h1>
-            <p className="text-gray-300 text-lg">
-              {carregandoLista ? 'Carregando...' : `${usuarios.length} usuário(s) cadastrado(s)`}
-            </p>
+      <div className="min-h-screen p-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 
+                className="text-4xl font-bold mb-2"
+                style={{
+                  fontFamily: 'Space Grotesk, sans-serif',
+                  background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
+                Gerenciar Usuários
+              </h1>
+              <p className="text-slate-400">
+                {carregando ? 'Carregando...' : `${usuariosFiltrados.length} usuário(s) cadastrado(s)`}
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                onClick={carregarUsuarios}
+                variant="outline"
+                className="bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
+                disabled={carregando}
+              >
+                <RefreshCw className={`mr-2 h-4 w-4 ${carregando ? 'animate-spin' : ''}`} />
+                Atualizar
+              </Button>
+              
+              <Button
+                onClick={() => navigate('/cadastro-usuario')}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg shadow-blue-500/30"
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                Novo Usuário
+              </Button>
+            </div>
           </div>
 
-          <div className="flex gap-3">
-            <Button
-              onClick={buscarUsuarios}
-              variant="outline"
-              className="bg-white/5 border-blue-500/30 text-white hover:bg-white/10"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Atualizar
-            </Button>
-
-            <Dialog open={dialogAberto} onOpenChange={setDialogAberto}>
-              <DialogTrigger asChild>
-                <Button
-                  onClick={abrirDialogNovo}
-                  className="bg-gradient-to-r from-purple-500 to-purple-600 text-white"
-                >
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Novo Usuário
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="glass-effect border-blue-500/20 max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-white text-2xl">
-                    {usuarioEditando ? 'Editar Usuário' : 'Novo Usuário'}
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-300">
-                    {usuarioEditando ? 'Atualize os dados do usuário' : 'Preencha os dados do usuário'}
-                  </DialogDescription>
-                </DialogHeader>
-
-                <form onSubmit={handleSubmit}>
-                  <div className="space-y-4 py-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-gray-200">Nome *</Label>
-                        <Input
-                          value={formData.nome}
-                          onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                          required
-                          className="bg-white/5 border-blue-500/30 text-white"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-gray-200">Username *</Label>
-                        <Input
-                          value={formData.usuario}
-                          onChange={(e) => setFormData({ ...formData, usuario: e.target.value })}
-                          required
-                          className="bg-white/5 border-blue-500/30 text-white"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-gray-200">E-mail *</Label>
-                        <Input
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          required
-                          className="bg-white/5 border-blue-500/30 text-white"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-gray-200">
-                          Senha {usuarioEditando ? '(deixe em branco para não alterar)' : '*'}
-                        </Label>
-                        <Input
-                          type="password"
-                          value={formData.senha}
-                          onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
-                          required={!usuarioEditando}
-                          className="bg-white/5 border-blue-500/30 text-white"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-gray-200">Tipo *</Label>
-                        <Select value={formData.tipo} onValueChange={(v) => setFormData({ ...formData, tipo: v })}>
-                          <SelectTrigger className="bg-white/5 border-blue-500/30 text-white">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ADM">Administrador</SelectItem>
-                            <SelectItem value="FISCAL">Fiscal</SelectItem>
-                            <SelectItem value="CONTABIL">Contábil</SelectItem>
-                            <SelectItem value="RH">RH</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t border-blue-500/20">
-                      <Label className="text-gray-200 text-lg mb-4 block">Permissões</Label>
-
-                      {['consultar', 'cadastrar', 'editar', 'excluir'].map((p) => (
-                        <div key={p} className="flex items-center justify-between p-3 bg-white/5 rounded-lg mb-2">
-                          <span className="text-gray-200 capitalize">{p}</span>
-                          <Switch
-                            checked={formData.permissoes[p]}
-                            onCheckedChange={(checked) =>
-                              setFormData({
-                                ...formData,
-                                permissoes: { ...formData.permissoes, [p]: checked }
-                              })
-                            }
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setDialogAberto(false);
-                        limparFormulario();
-                      }}
-                      className="bg-white/5 border-blue-500/30 text-white"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={carregando}
-                      className="bg-gradient-to-r from-purple-500 to-purple-600 text-white"
-                    >
-                      {carregando ? 'Salvando...' : usuarioEditando ? 'Atualizar' : 'Criar'}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+          {/* Barra de Busca */}
+          <div className="mt-6 relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" size={20} />
+            <input
+              type="text"
+              placeholder="Buscar por nome, username ou tipo..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-blue-500/20 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+              style={{
+                background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.4) 100%)',
+                backdropFilter: 'blur(10px)'
+              }}
+            />
           </div>
         </div>
 
-        {/* CARD DE ERRO DA API */}
-        {erroAPI && (
-          <Card className="glass-effect border-red-500/40 bg-red-500/10 mb-6">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <AlertCircle className="h-6 w-6 text-red-400 flex-shrink-0 mt-1" />
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-red-300 mb-2">
-                    ⚠️ Erro ao conectar com a API
-                  </h3>
-                  <p className="text-red-200 mb-3">{erroAPI.mensagem}</p>
-                  <div className="bg-black/30 p-3 rounded-lg">
-                    <p className="text-xs text-red-300 font-mono">{erroAPI.detalhes}</p>
-                  </div>
-                  
-                  <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                    <p className="text-sm text-blue-200 font-semibold mb-2">🔧 Como resolver:</p>
-                    <ol className="text-sm text-blue-100 space-y-2 ml-4 list-decimal">
-                      <li>Certifique-se que o servidor backend está rodando</li>
-                      <li>Verifique se criou o arquivo <code className="bg-black/30 px-1 rounded">listar-usuarios.js</code></li>
-                      <li>Verifique se registrou as rotas no <code className="bg-black/30 px-1 rounded">server.js</code></li>
-                      <li>Abra o Console (F12) para mais detalhes</li>
-                    </ol>
-                  </div>
-                </div>
+        {/* Estado de Erro */}
+        {erro && (
+          <div 
+            className="mb-6 p-4 rounded-xl border border-red-500/30 flex items-start gap-3"
+            style={{
+              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)'
+            }}
+          >
+            <AlertCircle className="text-red-400 mt-0.5" size={20} />
+            <div>
+              <h3 className="text-red-300 font-semibold mb-1">⚠️ Erro ao conectar com a API</h3>
+              <p className="text-red-400/80 text-sm mb-3">{erro}</p>
+              <div className="text-sm text-red-400/60 space-y-1">
+                <p className="font-semibold">✓ Como resolver:</p>
+                <ol className="list-decimal list-inside space-y-1 ml-2">
+                  <li>Certifique-se que o servidor backend está rodando</li>
+                  <li>Verifique se criou o arquivo <code className="bg-red-500/20 px-1 rounded">api/usuarios.js</code></li>
+                  <li>Verifique se registrou as rotas no <code className="bg-red-500/20 px-1 rounded">server.js</code></li>
+                  <li>Abra o Console (F12) para mais detalhes</li>
+                </ol>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
-        <Card className="glass-effect border-blue-500/20">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-2xl text-white">Usuários</CardTitle>
-              
-              {!erroAPI && (
-                <div className="relative w-72">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Buscar usuário..."
-                    value={busca}
-                    onChange={(e) => setBusca(e.target.value)}
-                    className="pl-10 bg-white/5 border-blue-500/30 text-white"
-                  />
-                </div>
-              )}
+        {/* Estado de Carregamento */}
+        {carregando && (
+          <div className="flex flex-col items-center justify-center py-20">
+            <RefreshCw className="animate-spin text-blue-400 mb-4" size={48} />
+            <p className="text-slate-400 text-lg">Carregando usuários...</p>
+          </div>
+        )}
+
+        {/* Estado Vazio */}
+        {!carregando && !erro && usuariosFiltrados.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div 
+              className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
+              style={{
+                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)',
+                border: '2px solid rgba(59, 130, 246, 0.3)'
+              }}
+            >
+              <User className="text-blue-400" size={40} />
             </div>
-          </CardHeader>
-          
-          <CardContent>
-            {carregandoLista ? (
-              <div className="text-center py-12">
-                <RefreshCw className="h-8 w-8 animate-spin text-purple-500 mx-auto mb-4" />
-                <p className="text-gray-400">Carregando usuários...</p>
-              </div>
-            ) : erroAPI ? (
-              <div className="text-center py-12">
-                <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                <p className="text-gray-400 text-lg mb-4">
-                  Não foi possível carregar os usuários
-                </p>
-                <Button
-                  onClick={buscarUsuarios}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Tentar novamente
-                </Button>
-              </div>
-            ) : usuariosFiltrados.length === 0 ? (
-              <div className="text-center py-12">
-                <UserPlus className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400 text-lg">
-                  {busca ? 'Nenhum usuário encontrado' : 'Nenhum usuário cadastrado ainda'}
-                </p>
-                {busca && (
-                  <Button
-                    onClick={() => setBusca('')}
-                    variant="outline"
-                    className="mt-4 bg-white/5 border-blue-500/30 text-white"
-                  >
-                    Limpar busca
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-blue-500/20 hover:bg-white/5">
-                      <TableHead className="text-gray-300">Nome</TableHead>
-                      <TableHead className="text-gray-300">Username</TableHead>
-                      <TableHead className="text-gray-300">E-mail</TableHead>
-                      <TableHead className="text-gray-300">Tipo</TableHead>
-                      <TableHead className="text-gray-300">Permissões</TableHead>
-                      <TableHead className="text-gray-300 text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {usuariosFiltrados.map((usuario) => (
-                      <TableRow key={usuario.id} className="border-blue-500/20 hover:bg-white/5">
-                        <TableCell className="text-white font-medium">{usuario.nome}</TableCell>
-                        <TableCell className="text-gray-300">{usuario.username || usuario.usuario}</TableCell>
-                        <TableCell className="text-gray-300">{usuario.email}</TableCell>
-                        <TableCell>
-                          <Badge className={getTipoBadge(usuario.tipo)}>
-                            {getTipoTexto(usuario.tipo)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-1 flex-wrap">
-                            {usuario.permissoes?.consultar && (
-                              <Badge variant="outline" className="bg-blue-500/10 text-blue-300 border-blue-500/30 text-xs">
-                                Consultar
-                              </Badge>
-                            )}
-                            {usuario.permissoes?.cadastrar && (
-                              <Badge variant="outline" className="bg-green-500/10 text-green-300 border-green-500/30 text-xs">
-                                Cadastrar
-                              </Badge>
-                            )}
-                            {usuario.permissoes?.editar && (
-                              <Badge variant="outline" className="bg-yellow-500/10 text-yellow-300 border-yellow-500/30 text-xs">
-                                Editar
-                              </Badge>
-                            )}
-                            {usuario.permissoes?.excluir && (
-                              <Badge variant="outline" className="bg-red-500/10 text-red-300 border-red-500/30 text-xs">
-                                Excluir
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              onClick={() => abrirDialogEditar(usuario)}
-                              variant="outline"
-                              size="sm"
-                              className="bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent className="glass-effect border-red-500/20">
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle className="text-white">Confirmar exclusão</AlertDialogTitle>
-                                  <AlertDialogDescription className="text-gray-300">
-                                    Tem certeza que deseja excluir o usuário <strong>{usuario.nome}</strong>? 
-                                    Esta ação não pode ser desfeita.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel className="bg-white/5 border-blue-500/30 text-white">
-                                    Cancelar
-                                  </AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleExcluir(usuario.id)}
-                                    className="bg-red-500 hover:bg-red-600 text-white"
-                                  >
-                                    Excluir
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              {busca ? 'Nenhum usuário encontrado' : 'Nenhum usuário cadastrado'}
+            </h3>
+            <p className="text-slate-400 mb-6">
+              {busca 
+                ? 'Tente ajustar os filtros de busca' 
+                : 'Comece cadastrando seu primeiro usuário'}
+            </p>
+            {!busca && (
+              <Button
+                onClick={() => navigate('/cadastro-usuario')}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                Cadastrar Primeiro Usuário
+              </Button>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        )}
+
+        {/* Grid de Cards */}
+        {!carregando && !erro && usuariosFiltrados.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {usuariosFiltrados.map((usuario) => (
+              <Card
+                key={usuario.id}
+                className="border-blue-500/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20 group"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%)',
+                  backdropFilter: 'blur(15px)'
+                }}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between mb-2">
+                    <div 
+                      className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-300 group-hover:scale-110"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.2) 100%)',
+                        border: '2px solid rgba(59, 130, 246, 0.4)',
+                        color: '#60a5fa'
+                      }}
+                    >
+                      {usuario.nome?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                    
+                    <Badge 
+                      variant={getBadgeVariant(usuario.tipo)}
+                      className="text-xs"
+                    >
+                      {usuario.tipo || 'N/A'}
+                    </Badge>
+                  </div>
+
+                  <CardTitle className="text-xl text-white font-bold">
+                    {usuario.nome || 'Nome não disponível'}
+                  </CardTitle>
+                  
+                  <CardDescription className="text-slate-400 flex items-center gap-2 mt-2">
+                    <User size={14} />
+                    @{usuario.username || 'username'}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="space-y-3">
+                  {/* ID */}
+                  <div className="flex items-center gap-2 text-sm">
+                    <Shield className="text-blue-400" size={16} />
+                    <span className="text-slate-400">ID:</span>
+                    <span className="text-slate-300 font-mono text-xs">{usuario.id}</span>
+                  </div>
+
+                  {/* Permissões */}
+                  <div>
+                    <p className="text-xs text-slate-400 mb-2 font-semibold">PERMISSÕES:</p>
+                    {renderPermissoes(usuario.permissoes)}
+                  </div>
+                </CardContent>
+
+                <CardFooter className="gap-2 pt-4 border-t border-blue-500/10">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
+                    onClick={() => {
+                      // Implementar visualização
+                      console.log('Visualizar:', usuario.id);
+                    }}
+                  >
+                    <Eye className="mr-1 h-3 w-3" />
+                    Ver
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20"
+                    onClick={() => {
+                      // Implementar edição
+                      console.log('Editar:', usuario.id);
+                    }}
+                  >
+                    <Edit className="mr-1 h-3 w-3" />
+                    Editar
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20"
+                    onClick={() => {
+                      // Implementar exclusão
+                      if (window.confirm(`Deseja realmente excluir ${usuario.nome}?`)) {
+                        console.log('Excluir:', usuario.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="mr-1 h-3 w-3" />
+                    Excluir
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </Layout>
   );
