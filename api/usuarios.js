@@ -35,13 +35,18 @@ module.exports = async (req, res) => {
 
     console.log("Usuários encontrados:", data?.length || 0);
     
-    return res.status(200).json(data || []);
+    // ✅ RETORNAR NO FORMATO ESPERADO PELO FRONTEND
+    return res.status(200).json({
+      success: true,
+      usuarios: data || []
+    });
     
   } catch (err) {
     console.error("Erro ao listar usuários:", err);
-    return res.status(400).json({ 
+    return res.status(500).json({ 
+      success: false,
       error: err.message,
-      details: "Erro ao buscar usuários do Supabase"
+      usuarios: []
     });
   }
 };
